@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>S04 Wybór wyzwania</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBF6EE}
+a{color:#A8461A}a:hover{color:#7E3312}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 52px 20px 32px; display: flex; flex-direction: column; gap: 16px; background: #FBF6EE; color: #1B2A33; font-family: 'Manrope', system-ui, sans-serif; overflow: hidden">
+<div style="display: flex; justify-content: flex-end">
+<a href="S03-Dzis.dc.html" aria-label="Zamknij" style="width: 44px; height: 44px; border-radius: 999px; background: #F3EADC; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B2A33" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 32px; line-height: 1.1; font-weight: 400">O ile odsuwasz pierwszego?</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #4A5963">Wybierz próg. Dilato wierzy Ci na słowo.</p>
+</div>
+
+<div role="radiogroup" aria-label="Próg wyzwania" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding-top: 8px">
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FBF6EE; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; position: relative"><span style="position: absolute; top: 6px; right: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1F7A6D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-label="Zdobyte"><path d="M5 12.5 10 17 19 7"></path></svg></span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">15</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">min</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FBF6EE; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; position: relative"><span style="position: absolute; top: 6px; right: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1F7A6D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-label="Zdobyte"><path d="M5 12.5 10 17 19 7"></path></svg></span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">30</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">min</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FBF6EE; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; position: relative"><span style="position: absolute; top: 6px; right: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1F7A6D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-label="Zdobyte"><path d="M5 12.5 10 17 19 7"></path></svg></span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">45</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">min</span></button>
+<button type="button" role="radio" aria-checked="true" style="height: 72px; border: 2px solid #C2551F; border-radius: 16px; background: #F8DCC8; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; position: relative"><span style="position: absolute; top: -9px; padding: 1px 7px; border-radius: 999px; background: #1F7A6D; color: #FFFFFF; font-size: 9px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase">Polecane</span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">1</span><span style="font-size: 11px; font-weight: 600; color: #4A5963">godz.</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">1,5</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">godz.</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">2</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">godz.</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">3</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">godz.</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">12:00</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">do południa</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">20:00</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">do wieczora</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">24</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">godz.</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">3</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">dni</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">7</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">dni</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">14</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">dni</span></button>
+<button type="button" role="radio" aria-checked="false" style="height: 72px; border: 1.5px solid #E6DCCB; border-radius: 16px; background: #FFFFFF; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">30</span><span style="font-size: 11px; font-weight: 600; color: #5E6A73">dni</span></button>
+<button type="button" style="height: 72px; border: 1.5px dashed #5E6A73; border-radius: 16px; background: transparent; color: #1B2A33; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B2A33" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span style="font-size: 11px; font-weight: 600; color: #4A5963">własne</span></button>
+<span></span>
+</div>
+
+<div style="padding: 16px; background: #FFFFFF; border: 1px solid #E6DCCB; border-radius: 20px; display: flex; gap: 14px; align-items: center">
+<svg width="52" height="52" viewBox="0 0 96 96" fill="none" aria-hidden="true"><circle cx="48" cy="48" r="46" fill="#FBEBC8"></circle><path d="M30 52a18 18 0 0 1 36 0" stroke="#C98A1C" stroke-width="4" stroke-linecap="round"></path><path d="M24 52h48" stroke="#1B2A33" stroke-width="3" stroke-linecap="round"></path><circle cx="60.7" cy="39.3" r="5" fill="#C98A1C"></circle><text x="48" y="77" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="17" font-weight="600" fill="#1B2A33">1 h</text></svg>
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 14px; font-weight: 700">Do zdobycia: Godzina dla siebie</span>
+<span style="font-size: 13px; line-height: 1.4; color: #4A5963">Licznik startuje, gdy klikniesz — w Twoim momencie. Po drodze odblokujesz „Serce zwalnia”.</span>
+</div>
+</div>
+
+<div style="flex-grow: 1"></div>
+<a href="S05-Timer.dc.html" style="height: 56px; border-radius: 999px; background: #C2551F; color: #FFFFFF; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none">Deklaruję: 1 godzina</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>S01 Powitanie</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBF6EE}
+a{color:#A8461A}a:hover{color:#7E3312}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 56px 20px 32px; display: flex; flex-direction: column; gap: 20px; background: #FBF6EE; color: #1B2A33; font-family: 'Manrope', system-ui, sans-serif; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="32" height="32" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M6 30a16 16 0 0 1 32 0" stroke="#1B2A33" stroke-width="3" stroke-linecap="round"></path><path d="M3 30h38" stroke="#1B2A33" stroke-width="3" stroke-linecap="round"></path><circle cx="33.3" cy="18.7" r="4.5" fill="#C2551F"></circle></svg>
+<span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 600">Dilato</span>
+</div>
+<svg width="350" height="250" viewBox="0 0 350 250" fill="none" role="img" aria-label="Horyzont z wschodzącym słońcem">
+<rect x="0" y="190" width="350" height="60" rx="0" fill="#F3EADC"></rect>
+<circle cx="250" cy="71.8" r="30" fill="#F8DCC8"></circle>
+<path d="M125 190A50 50 0 0 1 225 190" stroke="#EE8A4F" stroke-width="3" stroke-linecap="round"></path>
+<path d="M80 190A95 95 0 0 1 270 190" stroke="#D96A33" stroke-width="4" stroke-linecap="round"></path>
+<path d="M35 190A140 140 0 0 1 315 190" stroke="#E6DCCB" stroke-width="2"></path>
+<path d="M35 190A140 140 0 0 1 315 190" pathLength="100" stroke-dasharray="68 100" stroke="#C2551F" stroke-width="5" stroke-linecap="round"></path>
+<circle cx="250" cy="71.8" r="14" fill="#C2551F"></circle>
+<path d="M10 190h330" stroke="#1B2A33" stroke-width="2.5" stroke-linecap="round"></path>
+</svg>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<h1 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 40px; line-height: 1.05; font-weight: 400; letter-spacing: -0.02em">Nie musisz rzucać <em style="color: #A8461A">od jutra.</em></h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #4A5963">Wystarczy, że jutro zapalisz pierwszego papierosa 15 minut później. Potem trochę później. Dilato pomoże Ci przesuwać ten moment — aż zniknie za horyzontem.</p>
+</div>
+<div style="flex-grow: 1"></div>
+<div style="display: flex; justify-content: center; gap: 8px" aria-label="Krok 1 z 3">
+<span style="width: 24px; height: 8px; border-radius: 999px; background: #C2551F"></span>
+<span style="width: 8px; height: 8px; border-radius: 999px; background: #E6DCCB"></span>
+<span style="width: 8px; height: 8px; border-radius: 999px; background: #E6DCCB"></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<a href="S02-Ustawienia.dc.html" style="height: 56px; border-radius: 999px; background: #C2551F; color: #FFFFFF; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none">Zaczynamy</a>
+<button type="button" style="height: 48px; border: 0; background: transparent; color: #1B2A33; font-size: 15px; font-weight: 600">Jak to działa? · 1 min</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

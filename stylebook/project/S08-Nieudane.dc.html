@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>S08 Tym razem się nie udało</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B141B}
+a{color:#3E3670}a:hover{color:#1B2A33}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0B141B; color: #1B2A33; font-family: 'Manrope', system-ui, sans-serif; overflow: hidden">
+<div aria-hidden="true" style="height: 330px; box-sizing: border-box; padding: 52px 20px 0; display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.35; color: #FBF6EE">
+<span style="padding: 8px 14px; border-radius: 999px; background: #1E2F3B; font-size: 13px; font-weight: 700">Wyzwanie · 1 godzina</span>
+<svg width="300" height="176" viewBox="0 0 320 188" fill="none"><path d="M20 170A140 140 0 0 1 300 170" stroke="#2C3F4C" stroke-width="10" stroke-linecap="round"></path><path d="M20 170A140 140 0 0 1 300 170" pathLength="100" stroke-dasharray="68 100" stroke="#C2551F" stroke-width="10" stroke-linecap="round"></path><circle cx="220.5" cy="46.2" r="14" fill="#EE8A4F"></circle><path d="M4 170h312" stroke="#FBF6EE" stroke-width="2.5" stroke-linecap="round"></path></svg>
+<span style="font-family: 'Fraunces', Georgia, serif; font-size: 48px; font-weight: 300; margin-top: -70px">19:00</span>
+</div>
+<div role="dialog" aria-modal="true" aria-labelledby="s08t" style="flex-grow: 1; box-sizing: border-box; padding: 14px 22px 28px; background: #FFFFFF; border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 16px">
+<div style="width: 44px; height: 5px; border-radius: 999px; background: #D6D1EA; align-self: center"></div>
+<div style="width: 64px; height: 64px; border-radius: 999px; background: #E6E2F3; display: flex; align-items: center; justify-content: center">
+<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5F559A" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15h18M7 15a5 5 0 0 1 10 0M4 19h16"></path></svg>
+</div>
+<h1 id="s08t" style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 30px; line-height: 1.15; font-weight: 400">Tym razem się nie udało?</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #4A5963">W porządku. Zapiszemy Twój wynik: <strong style="color: #1B2A33">41 minut</strong>. To 41 minut, które zyskało Twoje ciało. Zdobyte odznaki zostają.</p>
+<div style="display: flex; gap: 10px">
+<div style="flex: 1 1 0; padding: 12px 14px; background: #E6E2F3; border-radius: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; font-weight: 700; color: #3E3670">Wynik</span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">41 min</span></div>
+<div style="flex: 1 1 0; padding: 12px 14px; background: #F3EADC; border-radius: 14px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; font-weight: 700; color: #5E6A73">Cel</span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 22px">1 h</span></div>
+</div>
+<div style="flex-grow: 1"></div>
+<a href="S09-PoWyniku.dc.html" style="height: 56px; border-radius: 999px; background: #5F559A; color: #FFFFFF; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none">Tak, zapisz wynik</a>
+<a href="S05-Timer.dc.html" style="height: 52px; border-radius: 999px; border: 1.5px solid #5F559A; color: #3E3670; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none">Jednak wracam do wyzwania</a>
+<span style="font-size: 12px; line-height: 1.45; color: #5E6A73; text-align: center">Nie oceniamy. To tylko dane do jutrzejszego planu.</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

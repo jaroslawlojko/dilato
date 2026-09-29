@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>S07 Cel osiągnięty</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBEBC8}
+a{color:#A8461A}a:hover{color:#7E3312}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 52px 20px 28px; display: flex; flex-direction: column; gap: 16px; background: #FBEBC8; color: #1B2A33; font-family: 'Manrope', system-ui, sans-serif; overflow: hidden">
+<div style="display: flex; justify-content: center">
+<span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #7A5410">Cel osiągnięty · 8:10</span>
+</div>
+
+<div style="display: flex; justify-content: center; padding-top: 4px">
+<svg width="330" height="200" viewBox="0 0 330 200" fill="none" aria-hidden="true">
+<path d="M25 170A140 140 0 0 1 305 170" stroke="#E9A93A" stroke-width="10" stroke-linecap="round"></path>
+<path d="M25 170A140 140 0 0 1 305 170" stroke="#F5D38D" stroke-width="28" stroke-linecap="round" opacity="0.35"></path>
+<circle cx="165" cy="100" r="68" fill="#FFFFFF"></circle>
+<circle cx="165" cy="100" r="60" fill="#FBEBC8"></circle>
+<circle cx="165" cy="100" r="60" stroke="#E9A93A" stroke-width="3"></circle>
+<path d="M141 106a24 24 0 0 1 48 0" stroke="#C98A1C" stroke-width="5" stroke-linecap="round"></path>
+<path d="M133 106h64" stroke="#1B2A33" stroke-width="3.5" stroke-linecap="round"></path>
+<circle cx="182" cy="89" r="6" fill="#C98A1C"></circle>
+<text x="165" y="138" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="20" font-weight="600" fill="#1B2A33">1 h</text>
+<path d="M4 170h322" stroke="#1B2A33" stroke-width="2.5" stroke-linecap="round"></path>
+<circle cx="305" cy="170" r="12" fill="#E9A93A"></circle>
+</svg>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+<span style="padding: 3px 10px; border-radius: 999px; background: #1B2A33; color: #E9A93A; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase">Nowa odznaka</span>
+<h1 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 36px; line-height: 1.1; font-weight: 400">Godzina dla siebie</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #4A5963">Pierwszy papieros odsunięty o całą godzinę. Tydzień temu to było 15 minut.</p>
+</div>
+
+<div style="padding: 16px; background: #FFFFFF; border-radius: 20px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #1B5F55">Odblokowane w ciele</span>
+<div style="display: flex; align-items: center; gap: 10px; font-size: 14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F7A6D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17 19 7"></path></svg>Serce zwalnia — tętno wraca do Twojego poziomu</div>
+<div style="display: flex; align-items: center; gap: 10px; font-size: 14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F7A6D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17 19 7"></path></svg>10 h bez dymu — więcej tlenu we krwi</div>
+</div>
+
+<div style="flex-grow: 1"></div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 14px; font-weight: 700; text-align: center">Co dalej? Decyzja należy do Ciebie.</span>
+<a href="S05-Timer.dc.html" style="height: 56px; border-radius: 999px; background: #C2551F; color: #FFFFFF; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none">Dokładam 30 minut</a>
+<a href="S03-Dzis.dc.html" style="height: 52px; border-radius: 999px; border: 1.5px solid #1B2A33; color: #1B2A33; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-decoration: none">Na dziś wystarczy</a>
+<span style="font-size: 12px; color: #4A5963; text-align: center">Dogrywka liczy się do rekordu i kolejnych odznak.</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
