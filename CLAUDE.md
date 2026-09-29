@@ -30,7 +30,7 @@ The repo lives on a drive without ownership info. Run git as `git -c safe.direct
 ## Status
 
 - 2026-09-29 — Owner decision: no 5/10-min steps; first suggestion 30 min for all profiles (15 min stays as a manual choice).
-- 2026-09-29 — Brainstorming done; MVP design spec + content tables written. **Next:** owner reviews the spec → write the implementation plan (`superpowers:writing-plans`).
+- 2026-09-29 — Brainstorming done; MVP design spec + content tables written. Spec approved. Roadmap (6 plans) + plan 1 written: `docs/superpowers/plans/`. **Next:** execute plan 1 (foundation & domain core).
 - Open owner tasks:
   - medical review of body-benefit copy (launch blocker);
   - native-speaker review of the EN copy;

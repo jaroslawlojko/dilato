@@ -129,6 +129,7 @@ All tables exist in SQLite (local) and Postgres (Supabase) with identical column
 | Column | Type | Notes |
 |---|---|---|
 | `day` | date | "Dilato day" per §4.1 |
+| `ladder_key` | ladder key or `'custom'` | step chosen on S04 (§4.2) |
 | `last_cigarette_at` | timestamp | answer to the morning question |
 | `started_at` | timestamp | tap on "Zaczynam" |
 | `target_kind` | `'minutes' \| 'until_noon' \| 'until_evening'` | |
@@ -136,12 +137,16 @@ All tables exist in SQLite (local) and Postgres (Supabase) with identical column
 | `target_at` | timestamp | `started_at + target_minutes` |
 | `status` | `'running' \| 'achieved' \| 'overtime' \| 'completed' \| 'interrupted'` | §4.5 |
 | `achieved_at` | timestamp? | = `target_at` when reached |
-| `overtime_target_minutes` | int | sum of overtime blocks chosen (15/30/60 each) |
-| `overtime_minutes` | int | overtime actually completed |
+| `overtime_block_started_at` | timestamp? | start of the current overtime block (tap on "Dokładam") |
+| `overtime_block_minutes` | int? | length of the current block: 15, 30 or 60 |
+| `overtime_minutes` | int | overtime completed so far (finished blocks + partial block on close) |
+| `overtime_blocks_completed` | int | number of fully completed blocks (for the Dokładka badge) |
 | `ended_at` | timestamp? | |
 | `result_minutes` | int? | §4.6 |
 | `first_cigarette_at` | timestamp? | = `ended_at` (§4.7) |
 | `used_craving_help` | bool | true if any craving session during this challenge |
+| `last_seen_at` | timestamp | last time the app showed this challenge in the foreground (set at start) |
+| `confirmed_at` | timestamp? | answer to the "Nadal trwa?" sheet (§4.5) |
 
 ### 3.3 `craving_sessions`
 
@@ -209,8 +214,8 @@ The **first suggestion is 30 min for every profile.** Profiles differ in the siz
 Computed each day from the history of closed challenges:
 
 1. No history → first suggestion (§4.3).
-2. Last two (or three, if `cigs_per_day > 20`) closed challenges all `completed` → suggest **one step above** the last target.
-3. Last closed challenge `interrupted` → suggest the **same step** as default, and show "one step lower" as a highlighted alternative (S09 "Plan na jutro"). The alternative may be 15 min.
+2. Last two (or three, if `cigs_per_day > 20`) closed challenges all `completed` **at the same step** as the last one → suggest **one step above** the last target. (30 ✓ 30 ✓ → 45; then 45 ✓ → still 45; 45 ✓ 45 ✓ → 1 h.) Custom targets count as their nearest ladder step at or below.
+3. Last closed challenge `interrupted` → suggest the **same step** as default (floored at 30 min per rule 5), and show the step below that suggestion as a highlighted alternative (S09 "Plan na jutro"). The alternative may be 15 min.
 4. Otherwise → the same step as the last target.
 5. The default suggestion never goes below 30 min. A last target of 15 min (chosen manually) is suggested as 30 min.
 
@@ -220,19 +225,19 @@ The user can always pick any step, including jumps of several steps. A "plan for
 
 ```
             start
-  (ready) ────────▶ running ──── now ≥ target_at ───▶ achieved ──"Dokładam X"──▶ overtime
-                       │                                  │                         │
-            "Tym razem się nie udało"            "Na dziś wystarczy"      overtime target reached
-                       ▼                          or next day rollover     or "Tym razem się nie udało"
-                  interrupted                             ▼                         ▼
-                                                      completed ◀───────────────────┘
+  (ready) ────────▶ running ──── now ≥ target_at ───▶ achieved ◀──── block reached ──┐
+                       │                               │     └──"Dokładam X"──▶ overtime
+            "Tym razem się nie udało"         "Na dziś wystarczy"                    │
+                       ▼                      or next day rollover     "Tym razem się nie udało"
+                  interrupted                          ▼                             ▼
+                                                   completed ◀───────────────────────┘
 ```
 
 - `achieved` is derived: any read of a `running` challenge with `now ≥ target_at` transitions it to `achieved` with `achieved_at = target_at` (not `now`).
-- From `achieved` the user may add overtime of 15, 30 or 60 minutes; from `overtime` they may add another block after reaching it (S07 offer repeats).
+- From `achieved` the user may add an overtime block of 15, 30 or 60 minutes. The block starts at the tap (time between reaching the goal and tapping does not count). When the block is reached (derived, like `achieved`), the challenge returns to `achieved`: `overtime_minutes += block`, `overtime_blocks_completed += 1`, `achieved_at = block end`. The S07 offer then repeats.
 - Tapping "Tym razem się nie udało" during `overtime` closes the challenge as **`completed`** (the goal was reached); only the completed part of overtime counts.
-- An `achieved` challenge left untouched is closed as `completed` at the next day rollover, with `ended_at = achieved_at`.
-- **Confirmation check ("Nadal trwa?"):** if a challenge reached `achieved` (or was auto-completed at rollover) without the app being opened between `started_at` and `target_at`, the next app open shows a gentle sheet: "Tak, udało się" keeps it; "Zapaliłem(-am) wcześniej" changes it to `interrupted` with a user-entered time between `started_at` and `target_at`. Badges already awarded by that challenge stay (badges are never lost); the record is recomputed.
+- "Na dziś wystarczy" closes the challenge as `completed` with `ended_at = now`. An `achieved` challenge left untouched is closed as `completed` at the next day rollover, with `ended_at = achieved_at` (the moment the goal or last block was reached).
+- **Confirmation check ("Nadal trwa?"):** if a challenge reached `achieved` (or was auto-completed at rollover) without the app being opened between `started_at` and `target_at` (i.e. `last_seen_at < target_at`) and `confirmed_at` is empty, the next app open shows a gentle sheet: "Tak, udało się" keeps it; "Zapaliłem(-am) wcześniej" changes it to `interrupted` with a user-entered time between `started_at` and `target_at`. Badges already awarded by that challenge stay (badges are never lost); the record is recomputed.
 
 ### 4.6 Result
 
