@@ -1,0 +1,50 @@
+[
+  {"epic": "P1 Foundation & domain core", "title": "[P1.1] Expo skeleton, Jest (Europe/Warsaw), time utilities", "body": "Plan: docs/superpowers/plans/2026-09-29-01-domain-core.md — Task 1\n\n- create-expo-app (blank-typescript), jest-expo, cross-env TZ\n- `src/domain/time.ts`: dilatoDay (04:00 boundary), addDays, minutesBetween, addMinutes, atLocalTime\n- Tests incl. DST 2026-10-25"},
+  {"epic": "P1 Foundation & domain core", "title": "[P1.2] Delay ladder + domain errors", "body": "Plan 1 — Task 2\n\n- Ladder m15…h24 incl. noon/evening, hidden < 15 min before cutoff\n- Custom 15–1440 min, step 5\n- DomainError codes"},
+  {"epic": "P1 Foundation & domain core", "title": "[P1.3] Habit profiles + daily suggestion", "body": "Plan 1 — Task 3\n\n- First suggestion 30 min for all profiles\n- Step up after 2 successes at the same step (3 if > 20 cigs/day)\n- Interrupted → same step + one lower alternative; never below 30 by default"},
+  {"epic": "P1 Foundation & domain core", "title": "[P1.4] Challenge state machine", "body": "Plan 1 — Task 4\n\n- running → achieved (derived) → overtime ↔ achieved → completed; running → interrupted\n- Overtime blocks 15/30/60 from the tap; rollover at 04:00; 'Nadal trwa?' confirmation\n- liveResultMinutes, clockProgress, canStartToday"},
+  {"epic": "P1 Foundation & domain core", "title": "[P1.5] Smoke-free clock + body benefits", "body": "Plan 1 — Task 5\n\n- smokeFreeMinutes, longest, default morning answer\n- 10 body-benefit thresholds, unlocked/next with progress"},
+  {"epic": "P1 Foundation & domain core", "title": "[P1.6] Statistics: streak, record, average, savings, timeline", "body": "Plan 1 — Task 6\n\n- Morning streak (active days), record, 7-day average\n- Savings ≈ minutes × cigs/960 × price per cigarette; time regained\n- S12 timeline rows (success/record/interrupted/empty)"},
+  {"epic": "P1 Foundation & domain core", "title": "[P1.7] Badges + celebration tier", "body": "Plan 1 — Task 7\n\n- 16 threshold (9 earnable in MVP) + 6 attitude badges = 22\n- newBadges, isNewRecord (repeatable), celebrationTier small/medium/large"},
+  {"epic": "P1 Foundation & domain core", "title": "[P1.8] Domain public API, purity guard, coverage gate", "body": "Plan 1 — Task 8\n\n- index.ts barrel, purity test (no React/IO/clock), coverage ≥95% lines / ≥85% branches\n- Update CLAUDE.md + roadmap status"},
+
+  {"epic": "P2 Local data & app services", "title": "[P2] Write plan 2 — local data & app services", "body": "Write docs/superpowers/plans/…-02-local-data.md from the spec §3, §8 and the finished domain."},
+  {"epic": "P2 Local data & app services", "title": "[P2] SQLite schema + migrations", "body": "Spec §3: profiles, challenges, craving_sessions, badges_earned + local outbox, sync_state, notification_log."},
+  {"epic": "P2 Local data & app services", "title": "[P2] Repositories (profile, challenges, cravings, badges)", "body": "Typed repositories over expo-sqlite; Jest with in-memory SQLite adapter."},
+  {"epic": "P2 Local data & app services", "title": "[P2] Outbox write path", "body": "Every write = SQLite transaction + outbox row (network push comes in P4)."},
+  {"epic": "P2 Local data & app services", "title": "[P2] ChallengeService (domain + persistence + badge awarding)", "body": "Applies domain transitions, persists, awards badges/new record, rollover on app open."},
+
+  {"epic": "P3 UI system & core screens", "title": "[P3] Write plan 3 — UI system & core screens", "body": "Spec §5–6, stylebook boards 02–03 and S01–S12."},
+  {"epic": "P3 UI system & core screens", "title": "[P3] Design tokens, fonts (Fraunces, Manrope), theming light/dark", "body": "Spec §6.1, §5.6."},
+  {"epic": "P3 UI system & core screens", "title": "[P3] Components: Button, ChallengeChip, StatTile, BadgeMark, BenefitCard, Sheet, Toast, BottomNav", "body": "Stylebook 03 Komponenty."},
+  {"epic": "P3 UI system & core screens", "title": "[P3] HorizonClock (sun arc, overtime arc)", "body": "Spec §6.3; react-native-svg + Reanimated."},
+  {"epic": "P3 UI system & core screens", "title": "[P3] Onboarding S01, explainer, S02 (+ pack price), S02b", "body": "Spec §5.1 (account step comes in P4)."},
+  {"epic": "P3 UI system & core screens", "title": "[P3] Tabs: Dziś (S03), Ciało (S10), Odznaki (S11 + detail), Postęp (S12)", "body": "Spec §5.2."},
+  {"epic": "P3 UI system & core screens", "title": "[P3] Challenge flow: morning question, S04–S09, small/medium celebrations", "body": "Spec §5.3."},
+  {"epic": "P3 UI system & core screens", "title": "[P3] Settings (local parts) + PL i18n", "body": "Spec §5.4, §10."},
+
+  {"epic": "P4 Backend, auth & sync", "title": "[P4] Write plan 4 — backend, auth & sync", "body": "Spec §8–9."},
+  {"epic": "P4 Backend, auth & sync", "title": "[P4] Supabase migrations + RLS + isolation tests", "body": "EU region; policy user_id = auth.uid() on every table."},
+  {"epic": "P4 Backend, auth & sync", "title": "[P4] Auth: register (Krok 1 z 3 + GDPR consents), login, forgot password, verify email", "body": "Email + password only."},
+  {"epic": "P4 Backend, auth & sync", "title": "[P4] Sync engine: outbox push, pull, LWW, full pull on login", "body": "Spec §8."},
+  {"epic": "P4 Backend, auth & sync", "title": "[P4] Logout, data export (JSON), delete-account Edge Function", "body": "Spec §9; App Store 5.1.1(v)."},
+
+  {"epic": "P5 Platform features", "title": "[P5] Write plan 5 — platform features", "body": "Spec §7."},
+  {"epic": "P5 Platform features", "title": "[P5] Local notifications with daily cap (max 4)", "body": "wake / half / five_left / goal / after_break; docs/content/notifications.md."},
+  {"epic": "P5 Platform features", "title": "[P5] iOS Live Activity (Swift widget target)", "body": "Arc, remaining, target time; Dynamic Island. Verify on a physical iPhone via EAS dev build."},
+  {"epic": "P5 Platform features", "title": "[P5] Android ongoing countdown notification", "body": "Spec §7.2."},
+  {"epic": "P5 Platform features", "title": "[P5] Large celebration (24 h) + share card", "body": "Sunrise animation, letter from the body, 1080×1350 share image without health data."},
+  {"epic": "P5 Platform features", "title": "[P5] 'Nadal trwa?' sheet, haptics, deep links", "body": "Spec §4.5, §7.4."},
+
+  {"epic": "P6 EN, E2E & release", "title": "[P6] Write plan 6 — EN, E2E & release", "body": "Spec §10–12."},
+  {"epic": "P6 EN, E2E & release", "title": "[P6] English localisation", "body": "Copy from docs/content/*.md into en.json."},
+  {"epic": "P6 EN, E2E & release", "title": "[P6] Maestro E2E flows", "body": "Onboarding → challenge → success/overtime; interrupt → result; kill app mid-challenge."},
+  {"epic": "P6 EN, E2E & release", "title": "[P6] EAS build profiles, TestFlight + Play Internal", "body": "development / preview / production."},
+  {"epic": "P6 EN, E2E & release", "title": "[P6] Store assets & listings (PL/EN), privacy labels, Data Safety", "body": "Icon from horizon mark."},
+
+  {"epic": "Owner tasks", "title": "[Owner] Medical review of body-benefit copy (LAUNCH BLOCKER)", "body": "docs/content/body-benefits.md — set medical_review: approved per card."},
+  {"epic": "Owner tasks", "title": "[Owner] Native-speaker review of EN copy", "body": "docs/content/*.md EN columns."},
+  {"epic": "Owner tasks", "title": "[Owner] Privacy policy + terms of service (PL/EN), hosted URL", "body": "Required before store submission; health data (GDPR Art. 9)."},
+  {"epic": "Owner tasks", "title": "[Owner] Apple Developer + Google Play developer accounts", "body": "Needed for EAS Submit / TestFlight / Play Internal."},
+  {"epic": "Owner tasks", "title": "[Owner] Create Supabase project (EU region)", "body": "Needed for plan 4."}
+]
