@@ -34,6 +34,16 @@
   - `f` / `m` use the chosen form.
 - **i18n:** keys needing a form use the i18next context: `key_f`, `key_m`, `key_neutral`.
 
+## Changed stylebook copy (first suggestion = 30 min)
+
+The stylebook uses "15 minut" as the entry step. The MVP starts suggestions at 30 min (spec §4.3), so:
+
+| Place | Stylebook | MVP PL | MVP EN |
+|---|---|---|---|
+| S01 body | …zapalisz pierwszego papierosa 15 minut później. | Wystarczy, że jutro zapalisz pierwszego papierosa 30 minut później. Potem trochę później. Dilato pomoże Ci przesuwać ten moment — aż zniknie za horyzontem. | All it takes is lighting your first cigarette 30 minutes later tomorrow. Then a bit later. Dilato helps you keep moving that moment — until it slips over the horizon. |
+| Store listing / cover line | o 15 minut, o godzinę, o dzień | o pół godziny, o godzinę, o dzień | by half an hour, an hour, a day |
+| Audience line | łatwiej zacząć od 15 minut niż od całego życia | łatwiej zacząć od pół godziny niż od całego życia | easier to start with half an hour than with a lifetime |
+
 ## Failure language
 
 - Interruption is always **"Tym razem się nie udało"** / **"Didn't work out this time"**.

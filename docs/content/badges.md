@@ -19,8 +19,6 @@ Tier = sky level and colour:
 
 | Key | Threshold | Tier | MVP | Name PL | Description PL | Name EN | Description EN |
 |---|---|---|---|---|---|---|---|
-| `t_5m` | 5 min | Świt | bonus¹ | Pierwsza chwila | Pięć minut, które należały do Ciebie. | First moment | Five minutes that were all yours. |
-| `t_10m` | 10 min | Świt | bonus¹ | Dziesięć spokojnych | Dziesięć minut. Każda to duży krok. | Ten calm minutes | Ten minutes. Each one a big step. |
 | `t_15m` | 15 min | Świt | yes | Pierwszy krok | Pierwsze odroczenie. Najtrudniejsze za Tobą. | First step | Your first delay. The hardest part is behind you. |
 | `t_30m` | 30 min | Świt | yes | Fala przeczekana | Głód przyszedł i odpłynął. Bez Ciebie. | Wave outlasted | The craving came and went. Without you. |
 | `t_45m` | 45 min | Świt | yes | Trzy kwadranse | Poranna kawa wypita bez papierosa. | Three quarters | Morning coffee, no cigarette. |
@@ -38,7 +36,7 @@ Tier = sky level and colour:
 | `t_90d` | 90 dni | Horyzont | wkrótce | Pora roku | Trzy miesiące nowego rytmu. | A season | Three months of a new rhythm. |
 | `t_365d` | 365 dni | Horyzont | wkrótce | Pełen obieg | Rok. Słońce zaszło za horyzont — i już tam zostało. | Full circle | A year. The sun went over the horizon — and stayed there. |
 
-¹ Bonus badges exist only when short steps are available (profile `wake` or > 20 cigarettes/day). Their names and copy are **new** (not in the stylebook) and need owner approval.
+There are no badges below 15 min. The ladder minimum is 15 min, and the default suggestion starts at 30 min (spec §4.3).
 
 "wkrótce" = shown locked with the label "wkrótce" / "coming soon" in the MVP, because the ladder caps at 24 h.
 

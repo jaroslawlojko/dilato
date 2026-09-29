@@ -1,6 +1,6 @@
 # Dilato
 
-A smoking-cessation app built on **delay**: each day the user pushes their first cigarette a little later (15 min → 1 h → 1 day). Polish + English, iOS + Android, free, account required.
+A smoking-cessation app built on **delay**: each day the user pushes their first cigarette a little later (30 min → 1 h → 1 day). Polish + English, iOS + Android, free, account required.
 
 ## Read first (in this order)
 
@@ -29,11 +29,11 @@ The repo lives on a drive without ownership info. Run git as `git -c safe.direct
 
 ## Status
 
+- 2026-09-29 — Owner decision: no 5/10-min steps; first suggestion 30 min for all profiles (15 min stays as a manual choice).
 - 2026-09-29 — Brainstorming done; MVP design spec + content tables written. **Next:** owner reviews the spec → write the implementation plan (`superpowers:writing-plans`).
 - Open owner tasks:
   - medical review of body-benefit copy (launch blocker);
   - native-speaker review of the EN copy;
-  - names for the 5/10-min bonus badges;
   - privacy policy + ToS (PL/EN);
   - Apple/Google developer accounts;
   - Supabase EU project.

@@ -9,9 +9,9 @@
 
 ## 1. Purpose
 
-Dilato is a smoking-cessation app built on **delay, not abstinence**: each day the user pushes their *first* cigarette a little later — 15 minutes, an hour, a day — until it disappears over the horizon. The strongest craving comes in the morning after a night without nicotine; Dilato fights only that one moment.
+Dilato is a smoking-cessation app built on **delay, not abstinence**: each day the user pushes their *first* cigarette a little later — 30 minutes, an hour, a day — until it disappears over the horizon. The strongest craving comes in the morning after a night without nicotine; Dilato fights only that one moment.
 
-**Audience:** daily smokers who have already tried "quitting from tomorrow" and find 15 minutes easier to commit to than a lifetime.
+**Audience:** daily smokers who have already tried "quitting from tomorrow" and find 30 minutes easier to commit to than a lifetime.
 
 **Product principles (from stylebook "00 Okładka"):**
 1. **Declaration, not control** — the user picks the challenge and taps start; the app takes their word.
@@ -171,8 +171,6 @@ Ordered steps:
 
 | Key | Target |
 |---|---|
-| `m5`* | 5 min |
-| `m10`* | 10 min |
 | `m15` | 15 min |
 | `m30` | 30 min |
 | `m45` | 45 min |
@@ -183,9 +181,9 @@ Ordered steps:
 | `noon` | until 12:00 local |
 | `evening` | until 20:00 local |
 | `h24` | 24 h |
-| `custom` | user-entered, 5 min – 24 h, 5-min granularity |
+| `custom` | user-entered, 15 min – 24 h, 5-min granularity |
 
-\* `m5` and `m10` ("short steps") are available only when `habit_profile = 'wake'` **or** `cigs_per_day > 20`.
+The ladder has **no steps below 15 min**. `m15` is available to everyone but is never the default suggestion (§4.3–4.4).
 
 - `noon` / `evening` resolve to minutes at start time; they are **hidden** in the picker when fewer than 15 minutes remain until 12:00 / 20:00.
 - For ordering and suggestions, `noon` and `evening` sit at their fixed position in the list above regardless of their resolved minutes.
@@ -197,21 +195,24 @@ The first suggestion and the four steps shown in onboarding (S02b "Twoja pierwsz
 
 | Profile | First ladder | First suggestion |
 |---|---|---|
-| `wake` | 5 · 10 · 15 · 30 min | 5 min |
-| `coffee` | 15 · 30 · 45 min · 1 h | 15 min |
-| `situation` | 15 · 30 min · 1 h · 2 h | 15 min |
+| `wake` | 30 · 45 min · 1 h · 1.5 h | 30 min |
+| `coffee` | 30 · 45 min · 1 h · 2 h | 30 min |
+| `situation` | 30 min · 1 h · 2 h · 3 h | 30 min |
 | `later` | 30 min · 1 h · 2 h · do wieczora | 30 min |
 
-If `cigs_per_day > 20`, short steps are unlocked and the first suggestion is one step lower on the full ladder: `wake` stays at 5 min (the floor), `coffee`/`situation` → 10 min, `later` → 15 min. The onboarding ladder preview shifts accordingly (e.g. `coffee` → 10 · 15 · 30 · 45 min).
+The **first suggestion is 30 min for every profile.** Profiles differ in the size of the steps shown in the preview (smaller for `wake`, larger for `situation`/`later`). 15 min can always be picked manually.
+
+**Heavier habit (`cigs_per_day > 20`):** the suggestion climbs more slowly: it takes **3** successes in a row, not 2, to suggest the next step (§4.4).
 
 ### 4.4 Daily suggestion
 
 Computed each day from the history of closed challenges:
 
 1. No history → first suggestion (§4.3).
-2. Last two closed challenges both `completed` and last result ≥ its target → suggest **one step above** the last target.
-3. Last closed challenge `interrupted` → suggest the **same step** as default, and show "one step lower" as a highlighted alternative (S09 "Plan na jutro").
+2. Last two (or three, if `cigs_per_day > 20`) closed challenges all `completed` → suggest **one step above** the last target.
+3. Last closed challenge `interrupted` → suggest the **same step** as default, and show "one step lower" as a highlighted alternative (S09 "Plan na jutro"). The alternative may be 15 min.
 4. Otherwise → the same step as the last target.
+5. The default suggestion never goes below 30 min. A last target of 15 min (chosen manually) is suggested as 30 min.
 
 The user can always pick any step, including jumps of several steps. A "plan for tomorrow" chosen on S09 overrides the computed suggestion for the next day.
 
@@ -255,7 +256,7 @@ Ten thresholds (5 min, 20 min, 8 h, 12 h, 24 h, 48 h, 72 h, 2 weeks, 1 month, 1 
 Full list and copy in `docs/content/badges.md`.
 
 - **Threshold badges** are awarded when a challenge's `result_minutes` (target + overtime) reaches the threshold; overtime can award badges mid-overtime.
-  - Earnable in MVP: 15, 30, 45 min, 1, 2, 3, 6, 12, 24 h, plus bonus 5 and 10 min when short steps are available (§4.2).
+  - Earnable in MVP: 15, 30, 45 min, 1, 2, 3, 6, 12, 24 h. The 15-min badge ("Pierwszy krok") is earned by any result ≥ 15 min, including a 30-min goal.
   - Shown locked with label "wkrótce" / "coming soon": 48 h, 72 h, 7, 14, 30, 90, 365 days.
 - **Attitude badges:**
 
@@ -268,7 +269,7 @@ Full list and copy in `docs/content/badges.md`.
 | `wave_master` | 3 `completed` challenges (cumulative) where `used_craving_help = true` |
 | `piggy_bank` | cumulative savings ≥ 100 PLN / 25 EUR / 25 USD / 20 GBP (in the profile's currency) |
 
-- The badge counter on S11 is "X z N", where N = 22, or 24 when short steps are available.
+- The badge counter on S11 is "X z 22".
 - A newly earned badge shows a gold ring and "Nowa" / "New" label for 24 h.
 
 ### 4.10 Celebration tier
@@ -462,10 +463,10 @@ A light impact on a small celebration; success notification haptics on medium/la
 1. Day boundary at 04:00 local; one challenge per day.
 2. The first cigarette is assumed at challenge end.
 3. The savings formula uses a 16-h waking day.
-4. The ">20 cigs/day" rule: unlocks 5/10-min short steps and lowers the first suggestion one step.
+4. The ladder minimum is 15 min and the first suggestion is 30 min for every profile. Profile starting ladders differ from the Method board (which starts `wake` at 5 min). The ">20 cigs/day" rule slows progression (3 successes to step up). **S01 and cover copy "15 minut później" becomes "30 minut później"** (see `docs/content/voice.md`).
 5. The onboarding "Krok 1 z 3" is account creation (the stylebook shows steps 2 and 3 only).
 6. Pack price is collected on S02.
 7. The Skarbonka threshold per currency.
 8. An unanswered `achieved` auto-completes at rollover.
-9. Short-step bonus badges (5, 10 min) extend the badge total to 24 for users with short steps.
+9. No bonus badges below 15 min; the badge total is 22 for everyone.
 10. Celebration tier selection (§4.10).
