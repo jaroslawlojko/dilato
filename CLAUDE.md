@@ -30,8 +30,8 @@ The repo lives on a drive without ownership info. Run git as `git -c safe.direct
 ## Status
 
 - 2026-09-29 — Owner decision: no 5/10-min steps; first suggestion 30 min for all profiles (15 min stays as a manual choice).
-- 2026-09-29 — Brainstorming done; MVP design spec + content tables written.
-- Plan 1 (foundation & domain core) implemented: `app/src/domain` complete and tested. **Next:** write plan 2 (local data & app services) — see `docs/superpowers/plans/2026-09-29-00-roadmap.md`.
+- 2026-09-29 — Brainstorming done; MVP design spec + content tables written. Spec approved.
+- 2026-09-30 — Plan 1 (foundation & domain core) implemented: `app/src/domain` complete and tested; spec clarified in §13 items 11–14. **Next:** write plan 2 (local data & app services) — read "Carried from plan 1" in `docs/superpowers/plans/2026-09-29-00-roadmap.md` first.
 - 2026-09-30 — Repo audit: no secrets in tracked files. The repo has no git remote and no GitHub repository yet; work is on the local branch `plan-1-domain-core` (from `master`).
 - Pending: push backlog (`docs/superpowers/plans/backlog-draft.json`, 42 items) to GitHub Project https://github.com/users/jaroslawlojko/projects/4. Unblocked as of 2026-09-30: `gh` is logged in with `project` + `repo` scopes and the project is empty (0 items, 18 fields), so there are no duplicates to skip. Issues need a GitHub repository first; otherwise add them as draft items.
 - Open owner tasks:
