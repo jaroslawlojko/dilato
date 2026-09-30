@@ -236,7 +236,7 @@ The user can always pick any step, including jumps of several steps. A "plan for
 - `achieved` is derived: any read of a `running` challenge with `now ≥ target_at` transitions it to `achieved` with `achieved_at = target_at` (not `now`).
 - From `achieved` the user may add an overtime block of 15, 30 or 60 minutes. The block starts at the tap (time between reaching the goal and tapping does not count). When the block is reached (derived, like `achieved`), the challenge returns to `achieved`: `overtime_minutes += block`, `overtime_blocks_completed += 1`, `achieved_at = block end`. The S07 offer then repeats.
 - Tapping "Tym razem się nie udało" during `overtime` closes the challenge as **`completed`** (the goal was reached); only the completed part of overtime counts.
-- "Na dziś wystarczy" closes the challenge as `completed` with `ended_at = now`. An `achieved` challenge left untouched is closed as `completed` at the next day rollover, with `ended_at = achieved_at` (the moment the goal or last block was reached).
+- "Na dziś wystarczy" closes the challenge as `completed` with `ended_at = now`. An `achieved` challenge left untouched is closed as `completed` at the next day rollover, with `ended_at = achieved_at` (the moment the goal or last block was reached). "Next day rollover" means the first 04:00 boundary after `achieved_at`, not after the start day: a goal reached on a later Dilato day (e.g. a 24 h challenge) stays `achieved` until the following rollover. An overtime block in progress is never cut at 04:00: it runs to its end, the challenge returns to `achieved`, and it is closed at the following rollover.
 - **Confirmation check ("Nadal trwa?"):** if a challenge reached `achieved` (or was auto-completed at rollover) without the app being opened between `started_at` and `target_at` (i.e. `last_seen_at < target_at`) and `confirmed_at` is empty, the next app open shows a gentle sheet: "Tak, udało się" keeps it; "Zapaliłem(-am) wcześniej" changes it to `interrupted` with a user-entered time between `started_at` and `target_at`. Badges already awarded by that challenge stay (badges are never lost); the record is recomputed.
 
 ### 4.6 Result
@@ -475,3 +475,4 @@ A light impact on a small celebration; success notification haptics on medium/la
 8. An unanswered `achieved` auto-completes at rollover.
 9. No bonus badges below 15 min; the badge total is 22 for everyone.
 10. Celebration tier selection (§4.10).
+11. Rollover is measured from `achieved_at`, and an overtime block crossing 04:00 runs to its end (§4.5).
