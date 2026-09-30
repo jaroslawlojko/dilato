@@ -170,12 +170,17 @@ export function interrupt(ch: Challenge, now: Date): Challenge {
   }
 }
 
-/** Closes what the previous Dilato day left open. Running challenges (e.g. 24 h) continue. */
+/**
+ * Closes what an earlier Dilato day left open: an `achieved` challenge is completed once a day
+ * rollover has passed since its goal (or last overtime block) was reached. Running challenges
+ * (e.g. 24 h) continue, and an in-flight overtime block always runs to its end.
+ */
 export function rollover(ch: Challenge, now: Date): Challenge {
   if (dilatoDay(now) === ch.day) return ch;
   const c = refresh(ch, now);
-  if (c.status === 'achieved') return complete(c, c.achievedAt ?? now);
-  if (c.status === 'overtime') return complete(withPartialOvertime(c, now), now);
+  if (c.status === 'achieved' && c.achievedAt && dilatoDay(now) !== dilatoDay(c.achievedAt)) {
+    return complete(c, c.achievedAt);
+  }
   return c;
 }
 

@@ -188,20 +188,49 @@ describe('rollover', () => {
     expect(c.endedAt).toEqual(t('08:50:00'));
   });
 
-  it('closes an overtime block that spans 04:00 with its partial minutes', () => {
+  it('lets an overtime block that spans 04:00 run to its end, whenever it is read', () => {
     const late = start({
       now: t('23:00:00'),
       lastCigaretteAt: t('20:00:00'),
       choice: { ladderKey: 'm30' },
     });
     const inOvertime = addOvertime(late, 60, nextDay('03:30:00'));
-    const c = rollover(inOvertime, nextDay('04:10:00'));
-    expect(c).toMatchObject({ status: 'completed', overtimeMinutes: 40, resultMinutes: 70 });
+
+    // Block still in flight just after the day boundary: nothing is cut.
+    expect(rollover(inOvertime, nextDay('04:10:00'))).toMatchObject({ status: 'overtime', overtimeMinutes: 0 });
+
+    // Block reached at 04:30 on the new day: back to achieved, not closed yet.
+    const reached = rollover(inOvertime, nextDay('04:40:00'));
+    expect(reached).toMatchObject({ status: 'achieved', overtimeMinutes: 60, overtimeBlocksCompleted: 1 });
+    expect(reached.achievedAt).toEqual(nextDay('04:30:00'));
+
+    // Left untouched until the following rollover: closed at the block end.
+    const closed = rollover(inOvertime, new Date('2026-10-01T05:00:00'));
+    expect(closed).toMatchObject({ status: 'completed', overtimeMinutes: 60, resultMinutes: 90 });
+    expect(closed.endedAt).toEqual(nextDay('04:30:00'));
   });
 
   it('keeps a 24 h challenge running into the next day', () => {
     const c = start({ choice: { ladderKey: 'h24' } });
     expect(rollover(c, nextDay('05:00:00')).status).toBe('running');
+  });
+
+  it('keeps a goal reached on a later Dilato day open until the following rollover', () => {
+    const c = start({ choice: { ladderKey: 'h24' } });
+    const reached = rollover(c, nextDay('07:30:00'));
+    expect(reached.status).toBe('achieved');
+    expect(reached.achievedAt).toEqual(nextDay('07:10:00'));
+    expect(addOvertime(reached, 60, nextDay('07:35:00')).status).toBe('overtime');
+
+    const closed = rollover(c, new Date('2026-10-01T05:00:00'));
+    expect(closed).toMatchObject({ status: 'completed', resultMinutes: 1440 });
+    expect(closed.endedAt).toEqual(nextDay('07:10:00'));
+  });
+
+  it('closes a long-abandoned challenge at its goal time', () => {
+    const c = rollover(start(), new Date('2026-10-03T12:00:00'));
+    expect(c).toMatchObject({ status: 'completed', resultMinutes: 60 });
+    expect(c.endedAt).toEqual(t('08:10:00'));
   });
 });
 
@@ -262,5 +291,7 @@ describe('misc', () => {
     expect(canStartToday([start()], nextDay('07:00:00'))).toBe(true);
     // a 24 h challenge still running blocks the next day
     expect(canStartToday([start({ choice: { ladderKey: 'h24' } })], nextDay('06:00:00'))).toBe(false);
+    // a 24 h challenge whose goal was reached today stays open until the user closes it
+    expect(canStartToday([start({ choice: { ladderKey: 'h24' } })], nextDay('08:00:00'))).toBe(false);
   });
 });
