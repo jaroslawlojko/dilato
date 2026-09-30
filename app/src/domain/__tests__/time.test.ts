@@ -65,3 +65,22 @@ describe('date helpers', () => {
     expect(atLocalTime(new Date('2026-09-29T07:10:30'), '12:00')).toEqual(new Date('2026-09-29T12:00:00'));
   });
 });
+
+describe('DST edges (Europe/Warsaw)', () => {
+  it('keeps day assignment and day arithmetic stable across spring-forward (2026-03-29)', () => {
+    expect(dilatoDay(new Date('2026-03-29T03:30:00'))).toBe('2026-03-28');
+    expect(dilatoDay(new Date('2026-03-29T04:00:00'))).toBe('2026-03-29');
+    expect(addDays('2026-03-28', 1)).toBe('2026-03-29');
+    expect(addDays('2026-03-29', 1)).toBe('2026-03-30');
+  });
+
+  it('measures real elapsed time across spring-forward', () => {
+    // 01:00 CET -> 05:00 CEST is 3 real hours
+    expect(minutesBetween(new Date('2026-03-29T01:00:00'), new Date('2026-03-29T05:00:00'))).toBe(180);
+  });
+
+  it('assigns both passes of the repeated hour (2026-10-25) to the previous Dilato day', () => {
+    expect(dilatoDay(new Date('2026-10-25T00:30:00Z'))).toBe('2026-10-24'); // 02:30 CEST
+    expect(dilatoDay(new Date('2026-10-25T01:30:00Z'))).toBe('2026-10-24'); // 02:30 CET
+  });
+});

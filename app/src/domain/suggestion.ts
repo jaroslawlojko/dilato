@@ -1,4 +1,4 @@
-import { stepAbove, stepBelow, stepForMinutes, stepIndex, type LadderKey } from './ladder';
+import { getStep, isStepAvailable, stepAbove, stepBelow, stepForMinutes, stepIndex, type LadderKey } from './ladder';
 import { FIRST_SUGGESTION, successesToStepUp } from './profile';
 
 export interface ClosedChallengeSummary {
@@ -35,8 +35,7 @@ export function suggestNext(
 
   if (last.status === 'interrupted') {
     const primary = atLeastFirstSuggestion(lastKey);
-    const lower = stepBelow(primary);
-    return { primary, lowerAlternative: lower === primary ? null : lower };
+    return { primary, lowerAlternative: stepBelow(primary) };
   }
 
   const needed = successesToStepUp(cigsPerDay);
@@ -47,4 +46,19 @@ export function suggestNext(
 
   const primary = atLeastFirstSuggestion(steppedUp ? stepAbove(lastKey) : lastKey);
   return { primary, lowerAlternative: null };
+}
+
+/**
+ * The suggestion as it can be offered at `now`: a step that cannot be started any more
+ * (noon / evening past their cutoff) is replaced by the nearest available step below it.
+ */
+export function availableSuggestion(suggestion: Suggestion, now: Date): Suggestion {
+  const nearestAvailable = (key: LadderKey): LadderKey => {
+    let k = key;
+    while (!isStepAvailable(getStep(k), now)) k = stepBelow(k);
+    return k;
+  };
+  const primary = nearestAvailable(suggestion.primary);
+  const lower = suggestion.lowerAlternative ? nearestAvailable(suggestion.lowerAlternative) : null;
+  return { primary, lowerAlternative: lower === primary ? null : lower };
 }

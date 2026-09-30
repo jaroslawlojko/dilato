@@ -19,6 +19,11 @@ const failed = (id: string, day: string, after: number) =>
   closedChallenge({ id, day, ladderKey: 'h1', outcome: 'interrupted', interruptedAfterMinutes: after });
 
 describe('activeDays and morningStreak', () => {
+  it('keeps the streak across spring-forward (2026-03-29)', () => {
+    const cs = [done('a', '2026-03-28'), done('b', '2026-03-29'), done('c', '2026-03-30')];
+    expect(morningStreak(cs, new Date('2026-03-30T12:00:00'))).toBe(3);
+  });
+
   it('counts consecutive days including interrupted ones', () => {
     const cs = [done('a', '2026-09-25'), failed('b', '2026-09-26', 5), done('c', '2026-09-27'),
       done('d', '2026-09-28'), done('e', '2026-09-29')];
@@ -72,6 +77,10 @@ describe('record and average', () => {
 });
 
 describe('money and time', () => {
+  it('reports no savings for an invalid pack size', () => {
+    expect(savings({ totalMinutes: 1024, cigsPerDay: 15, packPrice: 18, packSize: 0 })).toBe(0);
+  });
+
   it('estimates cigarettes, savings and time regained', () => {
     expect(cigarettesNotSmoked(1024, 15)).toBe(16);
     expect(savings({ totalMinutes: 1024, cigsPerDay: 15, packPrice: 18, packSize: 20 })).toBe(14.4);

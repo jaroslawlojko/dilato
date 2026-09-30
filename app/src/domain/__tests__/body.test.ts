@@ -15,6 +15,17 @@ describe('body benefits', () => {
     expect(unlockedBenefits(860)).toEqual(['b_5m', 'b_20m', 'b_8h', 'b_12h']);
   });
 
+  it('does not keep counting after an abandoned challenge was closed by rollover', () => {
+    const abandoned = startChallenge({
+      id: 'x',
+      now: new Date('2026-09-29T07:10:00'),
+      lastCigaretteAt: new Date('2026-09-28T22:00:00'),
+      choice: { ladderKey: 'm30' },
+    });
+    // goal 07:40; first cigarette assumed at the goal → 9 h 40 min, whenever it is read
+    expect(bestSmokeFreeMinutes([abandoned], new Date('2026-10-02T09:00:00'))).toBe(580);
+  });
+
   it('reports the next card with progress', () => {
     const next = nextBenefit(860);
     expect(next?.id).toBe('b_24h');

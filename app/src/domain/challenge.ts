@@ -14,27 +14,27 @@ export type OvertimeBlock = 15 | 30 | 60;
 export const OVERTIME_BLOCKS: readonly OvertimeBlock[] = [15, 30, 60];
 
 export interface Challenge {
-  id: string;
-  day: string;
-  ladderKey: LadderKey | 'custom';
-  targetKind: TargetKind;
-  targetMinutes: number;
-  lastCigaretteAt: Date;
-  startedAt: Date;
-  targetAt: Date;
-  status: ChallengeStatus;
+  readonly id: string;
+  readonly day: string;
+  readonly ladderKey: LadderKey | 'custom';
+  readonly targetKind: TargetKind;
+  readonly targetMinutes: number;
+  readonly lastCigaretteAt: Date;
+  readonly startedAt: Date;
+  readonly targetAt: Date;
+  readonly status: ChallengeStatus;
   /** When the goal (or the most recent overtime block) was reached. */
-  achievedAt: Date | null;
-  overtimeBlockStartedAt: Date | null;
-  overtimeBlockMinutes: OvertimeBlock | null;
-  overtimeMinutes: number;
-  overtimeBlocksCompleted: number;
-  endedAt: Date | null;
-  resultMinutes: number | null;
-  firstCigaretteAt: Date | null;
-  usedCravingHelp: boolean;
-  lastSeenAt: Date;
-  confirmedAt: Date | null;
+  readonly achievedAt: Date | null;
+  readonly overtimeBlockStartedAt: Date | null;
+  readonly overtimeBlockMinutes: OvertimeBlock | null;
+  readonly overtimeMinutes: number;
+  readonly overtimeBlocksCompleted: number;
+  readonly endedAt: Date | null;
+  readonly resultMinutes: number | null;
+  readonly firstCigaretteAt: Date | null;
+  readonly usedCravingHelp: boolean;
+  readonly lastSeenAt: Date;
+  readonly confirmedAt: Date | null;
 }
 
 export type ChallengeChoice = { ladderKey: LadderKey } | { customMinutes: number };
@@ -135,22 +135,27 @@ function withPartialOvertime(ch: Challenge, now: Date): Challenge {
   return { ...ch, overtimeMinutes: ch.overtimeMinutes + partial };
 }
 
+/** The challenge as it stands at `now`: closed by rollover if a day boundary has passed, then time-derived. */
+function upToDate(ch: Challenge, now: Date): Challenge {
+  return refresh(rollover(ch, now), now);
+}
+
 export function addOvertime(ch: Challenge, block: OvertimeBlock, now: Date): Challenge {
-  const c = refresh(ch, now);
+  const c = upToDate(ch, now);
   if (c.status !== 'achieved') throw new DomainError('invalid_transition');
   return { ...c, status: 'overtime', overtimeBlockStartedAt: now, overtimeBlockMinutes: block, lastSeenAt: now };
 }
 
 /** "Na dziś wystarczy". */
 export function finishForToday(ch: Challenge, now: Date): Challenge {
-  const c = refresh(ch, now);
+  const c = upToDate(ch, now);
   if (c.status !== 'achieved') throw new DomainError('invalid_transition');
   return { ...complete(c, now), lastSeenAt: now };
 }
 
 /** "Tym razem się nie udało". */
 export function interrupt(ch: Challenge, now: Date): Challenge {
-  const c = refresh(ch, now);
+  const c = upToDate(ch, now);
   switch (c.status) {
     case 'running':
       return {
@@ -185,7 +190,7 @@ export function rollover(ch: Challenge, now: Date): Challenge {
 }
 
 export function markSeen(ch: Challenge, now: Date): Challenge {
-  return { ...ch, lastSeenAt: now };
+  return now.getTime() > ch.lastSeenAt.getTime() ? { ...ch, lastSeenAt: now } : ch;
 }
 
 export function markCravingHelpUsed(ch: Challenge): Challenge {
@@ -202,13 +207,14 @@ export function needsConfirmation(ch: Challenge, now: Date): boolean {
 }
 
 export function confirmSucceeded(ch: Challenge, now: Date): Challenge {
+  if (!needsConfirmation(ch, now)) throw new DomainError('invalid_transition');
   return { ...ch, confirmedAt: now };
 }
 
 /** "Zapaliłem(-am) wcześniej": the goal was not actually reached. */
 export function confirmSmokedEarlier(ch: Challenge, smokedAt: Date, now: Date): Challenge {
-  const c = refresh(ch, now);
-  if (c.status !== 'achieved' && c.status !== 'completed') throw new DomainError('invalid_transition');
+  const c = upToDate(ch, now);
+  if (!needsConfirmation(c, now)) throw new DomainError('invalid_transition');
   if (smokedAt.getTime() < c.startedAt.getTime() || smokedAt.getTime() > c.targetAt.getTime()) {
     throw new DomainError('smoked_at_out_of_range');
   }
@@ -229,7 +235,7 @@ export function confirmSmokedEarlier(ch: Challenge, smokedAt: Date, now: Date): 
 
 /** Minutes the challenge is worth right now (target + overtime once reached). */
 export function liveResultMinutes(ch: Challenge, now: Date): number {
-  const c = refresh(ch, now);
+  const c = upToDate(ch, now);
   switch (c.status) {
     case 'running':
       return Math.max(0, minutesBetween(c.startedAt, now));

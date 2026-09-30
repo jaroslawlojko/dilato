@@ -1,5 +1,5 @@
 import { FIRST_SUGGESTION, STARTING_LADDERS, successesToStepUp } from '../profile';
-import { suggestNext, type ClosedChallengeSummary } from '../suggestion';
+import { availableSuggestion, suggestNext, type ClosedChallengeSummary } from '../suggestion';
 import type { LadderKey } from '../ladder';
 
 const ok = (ladderKey: LadderKey | 'custom', targetMinutes = 0): ClosedChallengeSummary => ({
@@ -72,7 +72,33 @@ describe('suggestNext', () => {
     expect(suggestNext([ok('h24'), ok('h24')], 15).primary).toBe('h24');
   });
 
+  it('does not step up a heavier habit on a mixed history', () => {
+    expect(suggestNext([ok('m30'), ok('m45'), ok('m45')], 25).primary).toBe('m45');
+  });
+
   it('uses the plan for tomorrow when one was set', () => {
     expect(suggestNext([fail('h1')], 15, 'm15')).toEqual({ primary: 'm15', lowerAlternative: null });
+  });
+});
+
+describe('availableSuggestion', () => {
+  const at = (hhmm: string) => new Date(`2026-09-29T${hhmm}:00`);
+
+  it('keeps a suggestion that can still be started', () => {
+    const s = { primary: 'noon' as const, lowerAlternative: null };
+    expect(availableSuggestion(s, at('09:00'))).toEqual(s);
+  });
+
+  it('falls back to the nearest available step below noon or evening', () => {
+    expect(availableSuggestion({ primary: 'noon', lowerAlternative: null }, at('12:30')).primary).toBe('h3');
+    expect(availableSuggestion({ primary: 'evening', lowerAlternative: null }, at('19:50')).primary).toBe('h3');
+    expect(availableSuggestion({ primary: 'evening', lowerAlternative: null }, at('12:30')).primary).toBe('evening');
+  });
+
+  it('adjusts the lower alternative and drops it when it equals the primary', () => {
+    expect(availableSuggestion({ primary: 'evening', lowerAlternative: 'noon' }, at('12:30')))
+      .toEqual({ primary: 'evening', lowerAlternative: 'h3' });
+    expect(availableSuggestion({ primary: 'noon', lowerAlternative: 'h3' }, at('12:30')))
+      .toEqual({ primary: 'h3', lowerAlternative: null });
   });
 });

@@ -42,6 +42,22 @@ describe('catalogue', () => {
 });
 
 describe('newBadges', () => {
+  it('awards thresholds for the minutes an interrupted attempt did reach', () => {
+    const c = closedChallenge({
+      id: 'i', day: '2026-09-29', ladderKey: 'h1', outcome: 'interrupted', interruptedAfterMinutes: 50,
+    });
+    expect(newBadges(ctx({ challenges: [c] }))).toEqual(['t_15m', 't_30m', 't_45m']);
+  });
+
+  it('never returns a badge that is already earned, even after the challenge was corrected', () => {
+    const earned = new Set<BadgeId>(['t_15m', 't_30m', 't_45m', 't_1h']);
+    const corrected = closedChallenge({
+      id: 'k', day: '2026-09-29', ladderKey: 'h1', outcome: 'interrupted', interruptedAfterMinutes: 20,
+    });
+    expect(newBadges(ctx({ challenges: [corrected], earned }))).toEqual([]);
+    expect(earned.size).toBe(4);
+  });
+
   it('awards nothing while a challenge is still running', () => {
     expect(newBadges(ctx({ challenges: [hourChallenge()], now: new Date('2026-09-29T07:50:00') }))).toEqual([]);
   });

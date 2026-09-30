@@ -254,9 +254,9 @@ describe('confirmation ("Nadal trwa?")', () => {
     expect(needsConfirmation(rollover(start(), nextDay('05:00:00')), nextDay('07:00:00'))).toBe(true);
   });
 
-  it('turns the challenge into an interruption at the reported time', () => {
-    const withOvertime = refresh(addOvertime(start(), 30, t('08:20:00')), t('09:00:00'));
-    const c = confirmSmokedEarlier(withOvertime, t('07:40:00'), t('09:05:00'));
+  it('turns an unattended challenge into an interruption at the reported time', () => {
+    const autoCompleted = rollover(start(), nextDay('05:00:00'));
+    const c = confirmSmokedEarlier(autoCompleted, t('07:40:00'), nextDay('07:00:00'));
     expect(c).toMatchObject({
       status: 'interrupted',
       resultMinutes: 30,
@@ -265,7 +265,23 @@ describe('confirmation ("Nadal trwa?")', () => {
     });
     expect(c.endedAt).toEqual(t('07:40:00'));
     expect(c.firstCigaretteAt).toEqual(t('07:40:00'));
-    expect(c.confirmedAt).toEqual(t('09:05:00'));
+    expect(c.confirmedAt).toEqual(nextDay('07:00:00'));
+  });
+
+  it('rejects correcting a challenge the user witnessed or already confirmed', () => {
+    const witnessed = refresh(addOvertime(start(), 30, t('08:20:00')), t('09:00:00'));
+    expect(() => confirmSmokedEarlier(witnessed, t('07:40:00'), t('09:05:00'))).toThrow('invalid_transition');
+    const confirmed = confirmSucceeded(start(), t('09:00:00'));
+    expect(() => confirmSmokedEarlier(confirmed, t('07:40:00'), t('09:05:00'))).toThrow('invalid_transition');
+  });
+
+  it('rejects confirming when no confirmation is pending', () => {
+    expect(() => confirmSucceeded(start(), t('07:30:00'))).toThrow('invalid_transition');
+  });
+
+  it('never moves lastSeenAt backwards', () => {
+    const seen = markSeen(start(), t('08:15:00'));
+    expect(markSeen(seen, t('07:30:00'))).toBe(seen);
   });
 
   it('rejects a smoke time outside the challenge window', () => {
@@ -274,6 +290,25 @@ describe('confirmation ("Nadal trwa?")', () => {
 
   it('rejects correcting a challenge that is still running', () => {
     expect(() => confirmSmokedEarlier(start(), t('07:20:00'), t('07:30:00'))).toThrow('invalid_transition');
+  });
+});
+
+describe('stale challenges (app closed across a rollover)', () => {
+  const later = new Date('2026-10-02T09:00:00');
+
+  it('rejects user transitions on a challenge that rollover has already closed', () => {
+    expect(() => finishForToday(start(), later)).toThrow('invalid_transition');
+    expect(() => interrupt(start(), later)).toThrow('invalid_transition');
+    expect(() => addOvertime(start(), 30, later)).toThrow('invalid_transition');
+  });
+
+  it('reports the goal result, not the elapsed days', () => {
+    expect(liveResultMinutes(start(), later)).toBe(60);
+  });
+
+  it('rejects finishing while an overtime block is still in flight', () => {
+    const inOvertime = addOvertime(start(), 30, t('08:20:00'));
+    expect(() => finishForToday(inOvertime, t('08:30:00'))).toThrow('invalid_transition');
   });
 });
 

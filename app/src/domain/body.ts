@@ -1,4 +1,4 @@
-import { isClosed, type Challenge } from './challenge';
+import { isClosed, rollover, type Challenge } from './challenge';
 import { longestSmokeFreeMinutes, smokeFreeMinutes } from './smokeFree';
 
 export type BodyBenefitId =
@@ -21,7 +21,7 @@ export const BODY_BENEFITS: readonly { id: BodyBenefitId; minutes: number }[] = 
 export function bestSmokeFreeMinutes(challenges: readonly Challenge[], now: Date): number {
   const live = challenges
     .filter((c) => !isClosed(c))
-    .reduce((max, c) => Math.max(max, smokeFreeMinutes(c, now)), 0);
+    .reduce((max, c) => Math.max(max, smokeFreeMinutes(rollover(c, now), now)), 0);
   return Math.max(longestSmokeFreeMinutes(challenges), live);
 }
 

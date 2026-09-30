@@ -22,6 +22,7 @@ function activeUntil(ch: Challenge, now: Date): Date {
 export function activeDays(challenges: readonly Challenge[], now: Date): Set<string> {
   const days = new Set<string>();
   for (const c of challenges) {
+    days.add(c.day);
     const last = dilatoDay(activeUntil(c, now));
     for (let d = c.day; d <= last; d = addDays(d, 1)) days.add(d);
   }
@@ -72,6 +73,7 @@ export function savings(input: {
   packPrice: number;
   packSize: number;
 }): number {
+  if (input.packSize <= 0) return 0;
   const value = cigarettesNotSmoked(input.totalMinutes, input.cigsPerDay) * (input.packPrice / input.packSize);
   return Math.round(value * 100) / 100;
 }
