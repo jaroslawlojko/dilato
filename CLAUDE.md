@@ -30,8 +30,10 @@ The repo lives on a drive without ownership info. Run git as `git -c safe.direct
 ## Status
 
 - 2026-09-29 — Owner decision: no 5/10-min steps; first suggestion 30 min for all profiles (15 min stays as a manual choice).
-- 2026-09-29 — Brainstorming done; MVP design spec + content tables written. Spec approved. Roadmap (6 plans) + plan 1 written: `docs/superpowers/plans/`. **Next:** execute plan 1 (foundation & domain core) — owner still to choose execution mode (subagent-driven vs. native; native recommended).
-- Pending: push backlog (`docs/superpowers/plans/backlog-draft.json`, 42 items) to GitHub Project https://github.com/users/jaroslawlojko/projects/4. Needs either the GitHub MCP `projects` toolset (header `"X-MCP-Toolsets": "default,projects"` in `~/.claude.json`, then `/mcp` reconnect) or `gh auth login -s project,repo` (gh CLI installed 2026-09-29). Inspect the project's existing items/fields before adding; skip duplicates.
+- 2026-09-29 — Brainstorming done; MVP design spec + content tables written. Spec approved.
+- 2026-09-30 — Plan 1 (foundation & domain core) implemented: `app/src/domain` complete and tested; spec clarified in §13 items 11–14. **Next:** write plan 2 (local data & app services) — read "Carried from plan 1" in `docs/superpowers/plans/2026-09-29-00-roadmap.md` first.
+- 2026-09-30 — Repo audit: no secrets in tracked files. The repo has no git remote and no GitHub repository yet; work is on the local branch `plan-1-domain-core` (from `master`).
+- Pending: push backlog (`docs/superpowers/plans/backlog-draft.json`, 42 items) to GitHub Project https://github.com/users/jaroslawlojko/projects/4. Unblocked as of 2026-09-30: `gh` is logged in with `project` + `repo` scopes and the project is empty (0 items, 18 fields), so there are no duplicates to skip. Issues need a GitHub repository first; otherwise add them as draft items.
 - Open owner tasks:
   - medical review of body-benefit copy (launch blocker);
   - native-speaker review of the EN copy;

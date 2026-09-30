@@ -1,7 +1,7 @@
 # Dilato — MVP Design Spec
 
 - **Date:** 2026-09-29
-- **Status:** Draft — awaiting owner review
+- **Status:** Approved by the owner on 2026-09-29; clarified during plan 1 execution (see §13).
 - **Source of truth for look & copy:** `stylebook/` (Stylebook v1.0, open `stylebook/index.html`)
 - **Content tables:** `docs/content/`
 
@@ -221,6 +221,8 @@ Computed each day from the history of closed challenges:
 
 The user can always pick any step, including jumps of several steps. A "plan for tomorrow" chosen on S09 overrides the computed suggestion for the next day.
 
+If the suggested step (or a plan for tomorrow) cannot be started at the moment it is shown — `noon` / `evening` past their cutoff (§4.2) — the nearest available step below it is offered instead.
+
 ### 4.5 Challenge state machine
 
 ```
@@ -236,8 +238,8 @@ The user can always pick any step, including jumps of several steps. A "plan for
 - `achieved` is derived: any read of a `running` challenge with `now ≥ target_at` transitions it to `achieved` with `achieved_at = target_at` (not `now`).
 - From `achieved` the user may add an overtime block of 15, 30 or 60 minutes. The block starts at the tap (time between reaching the goal and tapping does not count). When the block is reached (derived, like `achieved`), the challenge returns to `achieved`: `overtime_minutes += block`, `overtime_blocks_completed += 1`, `achieved_at = block end`. The S07 offer then repeats.
 - Tapping "Tym razem się nie udało" during `overtime` closes the challenge as **`completed`** (the goal was reached); only the completed part of overtime counts.
-- "Na dziś wystarczy" closes the challenge as `completed` with `ended_at = now`. An `achieved` challenge left untouched is closed as `completed` at the next day rollover, with `ended_at = achieved_at` (the moment the goal or last block was reached).
-- **Confirmation check ("Nadal trwa?"):** if a challenge reached `achieved` (or was auto-completed at rollover) without the app being opened between `started_at` and `target_at` (i.e. `last_seen_at < target_at`) and `confirmed_at` is empty, the next app open shows a gentle sheet: "Tak, udało się" keeps it; "Zapaliłem(-am) wcześniej" changes it to `interrupted` with a user-entered time between `started_at` and `target_at`. Badges already awarded by that challenge stay (badges are never lost); the record is recomputed.
+- "Na dziś wystarczy" closes the challenge as `completed` with `ended_at = now`. An `achieved` challenge left untouched is closed as `completed` at the next day rollover, with `ended_at = achieved_at` (the moment the goal or last block was reached). "Next day rollover" means the first 04:00 boundary after `achieved_at`, not after the start day: a goal reached on a later Dilato day (e.g. a 24 h challenge) stays `achieved` until the following rollover. An overtime block in progress is never cut at 04:00: it runs to its end, the challenge returns to `achieved`, and it is closed at the following rollover.
+- **Confirmation check ("Nadal trwa?"):** if a challenge reached `achieved` (or was auto-completed at rollover) without the app having been opened at or after `target_at` (i.e. `last_seen_at < target_at`) and `confirmed_at` is empty, the next app open shows a gentle sheet: "Tak, udało się" keeps it; "Zapaliłem(-am) wcześniej" changes it to `interrupted` with a user-entered time between `started_at` and `target_at`. Badges already awarded by that challenge stay (badges are never lost); the record is recomputed. Both answers are only accepted while this confirmation is pending.
 
 ### 4.6 Result
 
@@ -254,7 +256,7 @@ The user can always pick any step, including jumps of several steps. A "plan for
 
 ### 4.8 Body benefits
 
-Ten thresholds (5 min, 20 min, 8 h, 12 h, 24 h, 48 h, 72 h, 2 weeks, 1 month, 1 year) — content in `docs/content/body-benefits.md`. A card is **unlocked** when `max(longest_smoke_free, current_live_smoke_free) ≥ threshold`. Unlocks are permanent. S10 shows the next locked threshold with a percent progress and a tip ("Najbliżej, gdy wybierzesz wyzwanie «do wieczora»"). Three extra "poza ciałem" cards (money, time, smell) are always visible with live values.
+Ten thresholds (5 min, 20 min, 8 h, 12 h, 24 h, 48 h, 72 h, 2 weeks, 1 month, 1 year) — content in `docs/content/body-benefits.md`. A card is **unlocked** when `max(longest_smoke_free, current_live_smoke_free) ≥ threshold`. Unlocks are permanent. Permanence is a persistence rule: the data layer stores the highest smoke-free value ever reached and never lowers it, because an untouched `achieved` challenge keeps counting live until rollover closes it at its goal time (§4.5). S10 shows the next locked threshold with a percent progress and a tip ("Najbliżej, gdy wybierzesz wyzwanie «do wieczora»"). Three extra "poza ciałem" cards (money, time, smell) are always visible with live values.
 
 ### 4.9 Badges
 
@@ -475,3 +477,7 @@ A light impact on a small celebration; success notification haptics on medium/la
 8. An unanswered `achieved` auto-completes at rollover.
 9. No bonus badges below 15 min; the badge total is 22 for everyone.
 10. Celebration tier selection (§4.10).
+11. Rollover is measured from `achieved_at`, and an overtime block crossing 04:00 runs to its end (§4.5).
+12. A suggestion that cannot be started at display time falls back to the nearest available step below (§4.4).
+13. Body-benefit unlocks are kept permanent by persisting the highest smoke-free value ever reached (§4.8).
+14. "Nadal trwa?" answers are accepted only while the confirmation is pending; user transitions on a challenge already closed by rollover are rejected (§4.5).
