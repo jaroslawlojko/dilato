@@ -4,6 +4,7 @@
   "main": "index.ts",
   "dependencies": {
     "expo": "~57.0.26",
+    "expo-sqlite": "~57.0.3",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
     "react-native": "0.86.3"
@@ -21,8 +22,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "cross-env TZ=Europe/Warsaw jest",
-    "test:coverage": "cross-env TZ=Europe/Warsaw jest --coverage",
+    "test": "cross-env TZ=Europe/Warsaw NODE_OPTIONS=--disable-warning=ExperimentalWarning jest",
+    "test:coverage": "cross-env TZ=Europe/Warsaw NODE_OPTIONS=--disable-warning=ExperimentalWarning jest --coverage",
     "typecheck": "tsc --noEmit"
   },
   "private": true,
@@ -30,8 +31,11 @@
     "preset": "jest-expo",
     "collectCoverageFrom": [
       "src/domain/**/*.ts",
+      "src/data/**/*.ts",
       "!src/domain/index.ts",
-      "!src/domain/testing/**"
+      "!src/domain/testing/**",
+      "!src/data/testing/**",
+      "!src/data/drivers/**"
     ],
     "coverageThreshold": {
       "global": {

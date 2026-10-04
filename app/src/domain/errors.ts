@@ -3,7 +3,8 @@ export type DomainErrorCode =
   | 'step_unavailable'
   | 'last_cigarette_in_future'
   | 'invalid_transition'
-  | 'smoked_at_out_of_range';
+  | 'smoked_at_out_of_range'
+  | 'confirmation_pending';
 
 export class DomainError extends Error {
   readonly code: DomainErrorCode;

@@ -123,6 +123,7 @@ All tables exist in SQLite (local) and Postgres (Supabase) with identical column
 | `theme` | `'system' \| 'light' \| 'dark'` | default `system` |
 | `health_consent_at` | timestamp | GDPR Art. 9 explicit consent |
 | `terms_accepted_at` | timestamp | |
+| `best_smoke_free_minutes` | int ≥ 0 | highest smoke-free value ever reached; never lowered (§4.8); sync merges by max |
 
 ### 3.2 `challenges` (at most one per day)
 
@@ -158,9 +159,9 @@ All tables exist in SQLite (local) and Postgres (Supabase) with identical column
 
 ### 3.5 Local-only tables
 
-- `outbox` — `id`, `table`, `row_id`, `op`, `payload`, `attempts`, `next_attempt_at`.
-- `sync_state` — last successful pull timestamp per table.
-- `notification_log` — scheduled/sent notifications per day (enforces the daily cap).
+- `outbox` — `table_name`, `row_id` (together the key: one pending entry per row, replaced on each write), `op` (`'upsert'`; soft deletes are upserts), `payload` (the stored row as JSON), `attempts`, `next_attempt_at`, `created_at`.
+- `sync_state` — last successful pull timestamp per table (created by plan 4).
+- `notification_log` — scheduled/sent notifications per day (enforces the daily cap) (created by plan 5).
 
 ---
 
