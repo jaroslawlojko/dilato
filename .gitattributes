@@ -1,0 +1,2 @@
+# Store and check out text files with LF on every OS (Windows autocrlf would otherwise warn on each commit).
+* text=auto eol=lf
