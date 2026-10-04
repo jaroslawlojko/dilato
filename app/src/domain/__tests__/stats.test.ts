@@ -1,6 +1,5 @@
 import { startChallenge } from '../challenge';
 import {
-  PIGGY_BANK_THRESHOLD,
   activeDays,
   cigarettesNotSmoked,
   morningStreak,
@@ -95,10 +94,6 @@ describe('money and time', () => {
       choice: { ladderKey: 'h1' },
     });
     expect(totalResultMinutes([done('a', '2026-09-27'), failed('b', '2026-09-28', 41), running])).toBe(71);
-  });
-
-  it('defines the piggy-bank thresholds per currency', () => {
-    expect(PIGGY_BANK_THRESHOLD).toEqual({ PLN: 100, EUR: 25, USD: 25, GBP: 20 });
   });
 });
 

@@ -1,20 +1,15 @@
-import { isClosed, refresh, type Challenge } from './challenge';
+import { advance, isClosed, type Challenge } from './challenge';
 import { addDays, dilatoDay } from './time';
 
 export type Currency = 'PLN' | 'EUR' | 'USD' | 'GBP';
 
-export const PIGGY_BANK_THRESHOLD: Record<Currency, number> = { PLN: 100, EUR: 25, USD: 25, GBP: 20 };
 export const WAKING_MINUTES = 960;
 export const MINUTES_PER_CIGARETTE = 5;
 
-function closed(challenges: readonly Challenge[]): Challenge[] {
-  return challenges.filter(isClosed);
-}
-
 /** Last moment a challenge was genuinely active (never "now" for a forgotten, already-achieved one). */
 function activeUntil(ch: Challenge, now: Date): Date {
-  if (ch.endedAt) return ch.endedAt;
-  const c = refresh(ch, now);
+  const c = advance(ch, now);
+  if (isClosed(c)) return c.endedAt;
   return c.status === 'achieved' && c.achievedAt ? c.achievedAt : now;
 }
 
@@ -42,25 +37,29 @@ export function morningStreak(challenges: readonly Challenge[], now: Date): numb
   return streak;
 }
 
+/** A result is a new record when it beats an earlier record, and an earlier record exists. */
+export function beatsRecord(minutes: number, previousBest: number): boolean {
+  return previousBest > 0 && minutes > previousBest;
+}
+
 export function recordOf(challenges: readonly Challenge[]): { minutes: number; day: string } | null {
   let best: { minutes: number; day: string } | null = null;
-  for (const c of closed(challenges)) {
-    const minutes = c.resultMinutes ?? 0;
-    if (!best || minutes > best.minutes) best = { minutes, day: c.day };
+  for (const c of challenges.filter(isClosed)) {
+    if (!best || c.resultMinutes > best.minutes) best = { minutes: c.resultMinutes, day: c.day };
   }
   return best;
 }
 
 export function sevenDayAverage(challenges: readonly Challenge[], now: Date): number | null {
   const from = addDays(dilatoDay(now), -6);
-  const recent = closed(challenges).filter((c) => c.day >= from);
+  const recent = challenges.filter(isClosed).filter((c) => c.day >= from);
   if (recent.length === 0) return null;
-  const sum = recent.reduce((s, c) => s + (c.resultMinutes ?? 0), 0);
+  const sum = recent.reduce((s, c) => s + c.resultMinutes, 0);
   return Math.round(sum / recent.length);
 }
 
 export function totalResultMinutes(challenges: readonly Challenge[]): number {
-  return closed(challenges).reduce((s, c) => s + (c.resultMinutes ?? 0), 0);
+  return challenges.filter(isClosed).reduce((s, c) => s + c.resultMinutes, 0);
 }
 
 export function cigarettesNotSmoked(totalMinutes: number, cigsPerDay: number): number {
@@ -92,10 +91,10 @@ export function timelineRows(
 ): { day: string; minutes: number; kind: TimelineKind }[] {
   const byDay = new Map<string, { minutes: number; kind: TimelineKind }>();
   let best = 0;
-  const chronological = closed(challenges).sort((a, b) => a.startedAt.getTime() - b.startedAt.getTime());
+  const chronological = challenges.filter(isClosed).sort((a, b) => a.startedAt.getTime() - b.startedAt.getTime());
   for (const c of chronological) {
-    const minutes = c.resultMinutes ?? 0;
-    const isRecord = best > 0 && minutes > best;
+    const minutes = c.resultMinutes;
+    const isRecord = beatsRecord(minutes, best);
     best = Math.max(best, minutes);
     const kind: TimelineKind =
       c.status === 'interrupted' ? 'interrupted' : isRecord ? 'record' : 'success';

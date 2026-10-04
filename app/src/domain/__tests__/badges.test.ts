@@ -1,5 +1,6 @@
 import { addOvertime, startChallenge } from '../challenge';
 import {
+  PIGGY_BANK_THRESHOLD,
   TOTAL_BADGES,
   celebrationTier,
   isNewRecord,
@@ -149,5 +150,11 @@ describe('celebrationTier', () => {
     expect(celebrationTier([], 45)).toBe('small');
     expect(celebrationTier(['extra_time'], 90)).toBe('medium');
     expect(celebrationTier([], 1440)).toBe('large');
+  });
+});
+
+describe('piggy bank', () => {
+  it('defines the piggy-bank thresholds per currency', () => {
+    expect(PIGGY_BANK_THRESHOLD).toEqual({ PLN: 100, EUR: 25, USD: 25, GBP: 20 });
   });
 });

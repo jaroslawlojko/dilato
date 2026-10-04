@@ -1,5 +1,5 @@
 import { startChallenge, interrupt } from '../challenge';
-import { defaultLastCigaretteAt, longestSmokeFreeMinutes, smokeFreeMinutes } from '../smokeFree';
+import { bestSmokeFreeMinutes, defaultLastCigaretteAt, longestSmokeFreeMinutes, smokeFreeMinutes } from '../smokeFree';
 import { closedChallenge } from '../testing/fixtures';
 
 const running = () =>
@@ -49,5 +49,30 @@ describe('defaultLastCigaretteAt', () => {
     // 02:00 on 09-30 is still Dilato day 09-29, so "yesterday" is 09-28
     expect(defaultLastCigaretteAt(new Date('2026-09-30T02:00:00'), new Date('2026-09-27T23:40:00')))
       .toEqual(new Date('2026-09-28T23:40:00'));
+  });
+});
+
+describe('bestSmokeFreeMinutes', () => {
+  it('does not keep counting after an abandoned challenge was closed by rollover', () => {
+    const abandoned = startChallenge({
+      id: 'x',
+      now: new Date('2026-09-29T07:10:00'),
+      lastCigaretteAt: new Date('2026-09-28T22:00:00'),
+      choice: { ladderKey: 'm30' },
+    });
+    // goal 07:40; first cigarette assumed at the goal → 9 h 40 min, whenever it is read
+    expect(bestSmokeFreeMinutes([abandoned], new Date('2026-10-02T09:00:00'))).toBe(580);
+  });
+
+  it('uses the live value when it beats the longest closed one', () => {
+    const closed = closedChallenge({ id: 'a', day: '2026-09-28', outcome: 'completed' }); // 570
+    const live = startChallenge({
+      id: 'b',
+      now: new Date('2026-09-29T07:10:00'),
+      lastCigaretteAt: new Date('2026-09-28T20:00:00'),
+      choice: { ladderKey: 'h1' },
+    });
+    expect(bestSmokeFreeMinutes([closed], new Date('2026-09-29T07:10:00'))).toBe(570);
+    expect(bestSmokeFreeMinutes([closed, live], new Date('2026-09-29T07:40:00'))).toBe(700);
   });
 });

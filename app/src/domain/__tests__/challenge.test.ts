@@ -1,5 +1,6 @@
 import {
   addOvertime,
+  advance,
   canStartToday,
   clockProgress,
   confirmSmokedEarlier,
@@ -10,8 +11,6 @@ import {
   markCravingHelpUsed,
   markSeen,
   needsConfirmation,
-  refresh,
-  rollover,
   startChallenge,
   type StartInput,
 } from '../challenge';
@@ -73,15 +72,15 @@ describe('startChallenge', () => {
   });
 });
 
-describe('refresh and live values', () => {
+describe('advance and live values', () => {
   it('stays running before the target', () => {
     const c = start();
-    expect(refresh(c, t('07:47:12'))).toBe(c);
+    expect(advance(c, t('07:47:12'))).toBe(c);
     expect(liveResultMinutes(c, t('07:47:12'))).toBe(37);
   });
 
   it('becomes achieved at target time even when read much later', () => {
-    const c = refresh(start(), t('09:30:00'));
+    const c = advance(start(), t('09:30:00'));
     expect(c.status).toBe('achieved');
     expect(c.achievedAt).toEqual(t('08:10:00'));
     expect(liveResultMinutes(c, t('09:30:00'))).toBe(60);
@@ -103,8 +102,8 @@ describe('refresh and live values', () => {
     });
     expect(c.day).toBe('2026-10-24');
     expect(c.targetAt).toEqual(new Date('2026-10-25T02:00:00Z'));
-    expect(refresh(c, new Date('2026-10-25T01:59:00Z')).status).toBe('running');
-    expect(refresh(c, new Date('2026-10-25T02:00:00Z')).status).toBe('achieved');
+    expect(advance(c, new Date('2026-10-25T01:59:00Z')).status).toBe('running');
+    expect(advance(c, new Date('2026-10-25T02:00:00Z')).status).toBe('achieved');
   });
 
   it('does not mutate the input', () => {
@@ -155,7 +154,7 @@ describe('overtime', () => {
     expect(c.overtimeBlockStartedAt).toEqual(t('08:20:00'));
     expect(liveResultMinutes(c, t('08:35:00'))).toBe(75);
 
-    c = refresh(c, t('08:50:00'));
+    c = advance(c, t('08:50:00'));
     expect(c).toMatchObject({ status: 'achieved', overtimeMinutes: 30, overtimeBlocksCompleted: 1 });
     expect(c.achievedAt).toEqual(t('08:50:00'));
 
@@ -170,20 +169,24 @@ describe('overtime', () => {
   });
 });
 
-describe('rollover', () => {
-  it('leaves a challenge alone on the same Dilato day', () => {
-    const c = start();
-    expect(rollover(c, t('23:00:00'))).toBe(c);
+describe('advance across the day rollover', () => {
+  it('never closes an achieved challenge on its own Dilato day', () => {
+    expect(advance(start(), t('23:00:00'))).toMatchObject({ status: 'achieved', endedAt: null });
+  });
+
+  it('returns the same object when nothing changed, even across the day boundary', () => {
+    const c = start({ choice: { ladderKey: 'h24' } });
+    expect(advance(c, nextDay('05:00:00'))).toBe(c);
   });
 
   it('auto-completes an untouched achieved challenge at its goal time', () => {
-    const c = rollover(start(), nextDay('05:00:00'));
+    const c = advance(start(), nextDay('05:00:00'));
     expect(c).toMatchObject({ status: 'completed', resultMinutes: 60 });
     expect(c.endedAt).toEqual(t('08:10:00'));
   });
 
   it('counts a finished overtime block before auto-completing', () => {
-    const c = rollover(addOvertime(start(), 30, t('08:20:00')), nextDay('05:00:00'));
+    const c = advance(addOvertime(start(), 30, t('08:20:00')), nextDay('05:00:00'));
     expect(c).toMatchObject({ status: 'completed', resultMinutes: 90 });
     expect(c.endedAt).toEqual(t('08:50:00'));
   });
@@ -197,38 +200,38 @@ describe('rollover', () => {
     const inOvertime = addOvertime(late, 60, nextDay('03:30:00'));
 
     // Block still in flight just after the day boundary: nothing is cut.
-    expect(rollover(inOvertime, nextDay('04:10:00'))).toMatchObject({ status: 'overtime', overtimeMinutes: 0 });
+    expect(advance(inOvertime, nextDay('04:10:00'))).toMatchObject({ status: 'overtime', overtimeMinutes: 0 });
 
     // Block reached at 04:30 on the new day: back to achieved, not closed yet.
-    const reached = rollover(inOvertime, nextDay('04:40:00'));
+    const reached = advance(inOvertime, nextDay('04:40:00'));
     expect(reached).toMatchObject({ status: 'achieved', overtimeMinutes: 60, overtimeBlocksCompleted: 1 });
     expect(reached.achievedAt).toEqual(nextDay('04:30:00'));
 
     // Left untouched until the following rollover: closed at the block end.
-    const closed = rollover(inOvertime, new Date('2026-10-01T05:00:00'));
+    const closed = advance(inOvertime, new Date('2026-10-01T05:00:00'));
     expect(closed).toMatchObject({ status: 'completed', overtimeMinutes: 60, resultMinutes: 90 });
     expect(closed.endedAt).toEqual(nextDay('04:30:00'));
   });
 
   it('keeps a 24 h challenge running into the next day', () => {
     const c = start({ choice: { ladderKey: 'h24' } });
-    expect(rollover(c, nextDay('05:00:00')).status).toBe('running');
+    expect(advance(c, nextDay('05:00:00')).status).toBe('running');
   });
 
   it('keeps a goal reached on a later Dilato day open until the following rollover', () => {
     const c = start({ choice: { ladderKey: 'h24' } });
-    const reached = rollover(c, nextDay('07:30:00'));
+    const reached = advance(c, nextDay('07:30:00'));
     expect(reached.status).toBe('achieved');
     expect(reached.achievedAt).toEqual(nextDay('07:10:00'));
     expect(addOvertime(reached, 60, nextDay('07:35:00')).status).toBe('overtime');
 
-    const closed = rollover(c, new Date('2026-10-01T05:00:00'));
+    const closed = advance(c, new Date('2026-10-01T05:00:00'));
     expect(closed).toMatchObject({ status: 'completed', resultMinutes: 1440 });
     expect(closed.endedAt).toEqual(nextDay('07:10:00'));
   });
 
   it('closes a long-abandoned challenge at its goal time', () => {
-    const c = rollover(start(), new Date('2026-10-03T12:00:00'));
+    const c = advance(start(), new Date('2026-10-03T12:00:00'));
     expect(c).toMatchObject({ status: 'completed', resultMinutes: 60 });
     expect(c.endedAt).toEqual(t('08:10:00'));
   });
@@ -251,11 +254,11 @@ describe('confirmation ("Nadal trwa?")', () => {
   });
 
   it('asks after an unattended rollover auto-complete', () => {
-    expect(needsConfirmation(rollover(start(), nextDay('05:00:00')), nextDay('07:00:00'))).toBe(true);
+    expect(needsConfirmation(advance(start(), nextDay('05:00:00')), nextDay('07:00:00'))).toBe(true);
   });
 
   it('turns an unattended challenge into an interruption at the reported time', () => {
-    const autoCompleted = rollover(start(), nextDay('05:00:00'));
+    const autoCompleted = advance(start(), nextDay('05:00:00'));
     const c = confirmSmokedEarlier(autoCompleted, t('07:40:00'), nextDay('07:00:00'));
     expect(c).toMatchObject({
       status: 'interrupted',
@@ -269,10 +272,16 @@ describe('confirmation ("Nadal trwa?")', () => {
   });
 
   it('rejects correcting a challenge the user witnessed or already confirmed', () => {
-    const witnessed = refresh(addOvertime(start(), 30, t('08:20:00')), t('09:00:00'));
+    const witnessed = advance(addOvertime(start(), 30, t('08:20:00')), t('09:00:00'));
     expect(() => confirmSmokedEarlier(witnessed, t('07:40:00'), t('09:05:00'))).toThrow('invalid_transition');
     const confirmed = confirmSucceeded(start(), t('09:00:00'));
     expect(() => confirmSmokedEarlier(confirmed, t('07:40:00'), t('09:05:00'))).toThrow('invalid_transition');
+  });
+
+  it('confirms a stale challenge as rollover has closed it', () => {
+    const c = confirmSucceeded(start(), nextDay('07:00:00'));
+    expect(c).toMatchObject({ status: 'completed', resultMinutes: 60, confirmedAt: nextDay('07:00:00') });
+    expect(c.endedAt).toEqual(t('08:10:00'));
   });
 
   it('rejects confirming when no confirmation is pending', () => {
