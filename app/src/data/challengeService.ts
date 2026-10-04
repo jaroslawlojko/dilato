@@ -87,6 +87,11 @@ function requireOpen(s: Loaded, now: Date): Challenge {
   return c;
 }
 
+/** "Nadal trwa?" must be answered before anything else changes (spec §4.5). */
+function requireNoPending(s: Loaded, now: Date): void {
+  if (s.challenges.some((c) => needsConfirmation(c, now))) throw new DomainError('confirmation_pending');
+}
+
 function requirePending(s: Loaded, now: Date): Challenge {
   const c = [...s.challenges].reverse().find((ch) => needsConfirmation(ch, now));
   if (!c) throw new DomainError('invalid_transition');
@@ -151,18 +156,21 @@ export function createChallengeService({ db, userId, newId }: ChallengeServiceDe
 
     start: (input: { choice: ChallengeChoice; lastCigaretteAt: Date }, now: Date) =>
       commit(now, (s) => {
+        requireNoPending(s, now);
         if (!canStartToday(s.challenges, now)) throw new DomainError('invalid_transition');
         return { challenge: startChallenge({ id: newId(), now, ...input }) };
       }),
 
     addOvertime: (block: OvertimeBlock, now: Date) =>
-      commit(now, (s) => ({ challenge: addOvertime(requireOpen(s, now), block, now) })),
+      commit(now, (s) => (requireNoPending(s, now), { challenge: addOvertime(requireOpen(s, now), block, now) })),
 
     /** "Na dziś wystarczy". */
-    finishForToday: (now: Date) => commit(now, (s) => ({ challenge: finishForToday(requireOpen(s, now), now) })),
+    finishForToday: (now: Date) =>
+      commit(now, (s) => (requireNoPending(s, now), { challenge: finishForToday(requireOpen(s, now), now) })),
 
     /** "Tym razem się nie udało". */
-    interrupt: (now: Date) => commit(now, (s) => ({ challenge: interrupt(requireOpen(s, now), now) })),
+    interrupt: (now: Date) =>
+      commit(now, (s) => (requireNoPending(s, now), { challenge: interrupt(requireOpen(s, now), now) })),
 
     /** "Tak, udało się". */
     confirmSucceeded: (now: Date) =>
@@ -172,17 +180,23 @@ export function createChallengeService({ db, userId, newId }: ChallengeServiceDe
     confirmSmokedEarlier: (smokedAt: Date, now: Date) =>
       commit(now, (s) => ({ challenge: confirmSmokedEarlier(requirePending(s, now), smokedAt, now) })),
 
-    /** The foreground showed the open challenge. Ignored while a "Nadal trwa?" answer is pending. */
-    markSeen: (now: Date) =>
+    /**
+     * The timer screen has shown the open challenge without a break since `visibleSince`. A goal the
+     * screen watched arrive counts as seen; one reached before the screen appeared waits for the
+     * "Nadal trwa?" answer instead.
+     */
+    markSeen: (visibleSince: Date, now: Date) =>
       commit(now, (s) => {
-        if (s.challenges.some((c) => needsConfirmation(c, now))) return {};
         const open = openAt(s, now);
-        return open ? { challenge: markSeen(open, now) } : {};
+        if (!open) return {};
+        if (needsConfirmation(open, now) && visibleSince.getTime() > open.targetAt.getTime()) return {};
+        return { challenge: markSeen(open, now) };
       }),
 
     /** S06 "Mam głód": the challenge counts as helped (`wave_master`). */
     startCraving: (technique: Technique, now: Date) =>
       commit(now, (s) => {
+        requireNoPending(s, now);
         const open = requireOpen(s, now);
         return {
           challenge: markCravingHelpUsed(open),

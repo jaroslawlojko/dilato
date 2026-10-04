@@ -40,8 +40,11 @@ export async function listChallenges(tx: Tx, userId: string): Promise<Challenge[
   return rows.map(challengeFromRow);
 }
 
+/** Every save validates like a read, so a bad record fails its own write, never every later read. */
 export async function saveChallenge(tx: Tx, userId: string, ch: Challenge, now: Date): Promise<void> {
-  await writeRow(tx, 'challenges', challengeToRow(ch, userId), now);
+  const row = challengeToRow(ch, userId);
+  challengeFromRow(row);
+  await writeRow(tx, 'challenges', row, now);
 }
 
 export async function listEarned(tx: Tx, userId: string): Promise<EarnedBadge[]> {
@@ -71,7 +74,9 @@ export async function awardBadge(
   } else {
     badge = { id: newId(), badgeId: award.badgeId, firstEarnedAt: now, lastEarnedAt: now, times: 1, challengeId: award.challengeId };
   }
-  await writeRow(tx, 'badges_earned', earnedBadgeToRow(badge, userId), now);
+  const row = earnedBadgeToRow(badge, userId);
+  earnedBadgeFromRow(row);
+  await writeRow(tx, 'badges_earned', row, now);
   return badge;
 }
 
@@ -85,5 +90,7 @@ export async function activeCraving(tx: Tx, userId: string): Promise<CravingSess
 }
 
 export async function saveCraving(tx: Tx, userId: string, session: CravingSession, now: Date): Promise<void> {
-  await writeRow(tx, 'craving_sessions', cravingToRow(session, userId), now);
+  const row = cravingToRow(session, userId);
+  cravingFromRow(row);
+  await writeRow(tx, 'craving_sessions', row, now);
 }

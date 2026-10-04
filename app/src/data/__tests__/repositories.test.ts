@@ -61,6 +61,16 @@ describe('challenges', () => {
     ]);
   });
 
+  it('rejects a challenge that breaks the data model and writes nothing', async () => {
+    const db = await openTestDb();
+    const closed = interrupt(challenge('c1', '2026-09-29T07:10:00'), at('2026-09-29T07:30:00'));
+    await expect(
+      db.transaction((tx) => saveChallenge(tx, USER, { ...closed, resultMinutes: null }, at('2026-09-29T07:30:00'))),
+    ).rejects.toThrow('challenges.result_minutes:');
+    expect(await listChallenges(db, USER)).toEqual([]);
+    expect(await listOutbox(db)).toEqual([]);
+  });
+
   it('allows one challenge per Dilato day', async () => {
     const db = await openTestDb();
     await db.transaction((tx) => saveChallenge(tx, USER, challenge('c1', '2026-09-29T07:10:00'), at('2026-09-29T07:10:00')));

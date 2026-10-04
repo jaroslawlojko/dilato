@@ -55,7 +55,8 @@ describe('ChallengeService', () => {
   it('awards threshold badges when the goal is reached, not again on finish', async () => {
     const { db, svc } = await setup();
     await svc.start(choose('h1', at('2026-09-28T22:10:00')), at('2026-09-29T07:10:00'));
-    expect(ids((await svc.open(at('2026-09-29T08:15:00'))).awarded)).toEqual(['t_15m', 't_30m', 't_45m', 't_1h']);
+    const watched = await svc.markSeen(at('2026-09-29T08:00:00'), at('2026-09-29T08:15:00'));
+    expect(ids(watched.awarded)).toEqual(['t_15m', 't_30m', 't_45m', 't_1h']);
     const done = await svc.finishForToday(at('2026-09-29T08:30:00'));
     expect(done.awarded).toEqual([]);
     expect(done.current).toMatchObject({ status: 'completed', resultMinutes: 60 });
@@ -112,25 +113,51 @@ describe('ChallengeService', () => {
   it('does not mark the challenge seen while "Nadal trwa?" is unanswered', async () => {
     const { db, svc } = await setup();
     await svc.start(choose('h1', at('2026-09-28T22:10:00')), at('2026-09-29T07:10:00'));
-    await svc.markSeen(at('2026-09-29T09:00:00'));
+    await svc.markSeen(at('2026-09-29T09:00:00'), at('2026-09-29T09:00:00'));
     expect((await listChallenges(db, USER))[0].lastSeenAt).toEqual(at('2026-09-29T07:10:00'));
     expect((await svc.confirmSucceeded(at('2026-09-29T09:01:00'))).pendingConfirmation).toBeNull();
-    await svc.markSeen(at('2026-09-29T09:02:00'));
+    await svc.markSeen(at('2026-09-29T09:02:00'), at('2026-09-29T09:02:00'));
     expect((await listChallenges(db, USER))[0].lastSeenAt).toEqual(at('2026-09-29T09:02:00'));
+  });
+
+  it('marks the goal seen when the timer screen watched it arrive', async () => {
+    const { db, svc } = await setup();
+    await svc.start(choose('h1', at('2026-09-28T22:10:00')), at('2026-09-29T07:10:00'));
+    const s = await svc.markSeen(at('2026-09-29T08:00:00'), at('2026-09-29T08:10:01'));
+    expect(s.pendingConfirmation).toBeNull();
+    expect((await listChallenges(db, USER))[0].lastSeenAt).toEqual(at('2026-09-29T08:10:01'));
+    expect((await svc.open(at('2026-09-29T08:30:00'))).pendingConfirmation).toBeNull();
+  });
+
+  it('blocks other actions until "Nadal trwa?" is answered', async () => {
+    const { svc } = await setup();
+    await svc.start(choose('h1', at('2026-09-28T22:10:00')), at('2026-09-29T07:10:00'));
+    await expect(svc.addOvertime(30, at('2026-09-29T09:00:00'))).rejects.toThrow('confirmation_pending');
+    await expect(svc.finishForToday(at('2026-09-29T09:00:00'))).rejects.toThrow('confirmation_pending');
+    await expect(svc.interrupt(at('2026-09-29T09:00:00'))).rejects.toThrow('confirmation_pending');
+    await expect(svc.startCraving('water', at('2026-09-29T09:00:00'))).rejects.toThrow('confirmation_pending');
+    const nextMorning = choose('h1', at('2026-09-29T22:10:00'));
+    await expect(svc.start(nextMorning, at('2026-09-30T07:10:00'))).rejects.toThrow('confirmation_pending');
+
+    await svc.confirmSucceeded(at('2026-09-30T07:11:00'));
+    const s = await svc.start(nextMorning, at('2026-09-30T07:12:00'));
+    expect(s.current).toMatchObject({ day: '2026-09-30', status: 'running' });
   });
 
   it('rejects a transition on a challenge that rollover closed, and writes nothing', async () => {
     const { db, svc } = await setup();
     await svc.start(choose('h1', at('2026-09-28T22:10:00')), at('2026-09-29T07:10:00'));
+    await svc.markSeen(at('2026-09-29T08:00:00'), at('2026-09-29T08:15:00')); // goal watched: nothing to confirm
     const before = await listOutbox(db);
     await expect(svc.interrupt(at('2026-10-02T09:00:00'))).rejects.toThrow('invalid_transition');
-    expect((await listChallenges(db, USER))[0].status).toBe('running');
+    expect((await listChallenges(db, USER))[0].status).toBe('achieved');
     expect(await listOutbox(db)).toEqual(before);
   });
 
   it('awards extra_time when an overtime block completes', async () => {
     const { svc } = await setup();
     await svc.start(choose('h1', at('2026-09-28T22:10:00')), at('2026-09-29T07:10:00'));
+    await svc.markSeen(at('2026-09-29T08:00:00'), at('2026-09-29T08:15:00'));
     await svc.addOvertime(30, at('2026-09-29T08:20:00'));
     expect(ids((await svc.open(at('2026-09-29T08:50:00'))).awarded)).toContain('extra_time');
   });
