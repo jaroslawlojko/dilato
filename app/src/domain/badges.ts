@@ -1,5 +1,5 @@
-import { isClosed, liveResultMinutes, refresh, type Challenge } from './challenge';
-import { PIGGY_BANK_THRESHOLD, morningStreak, type Currency } from './stats';
+import { advance, isClosed, liveResultMinutes, type Challenge } from './challenge';
+import { beatsRecord, morningStreak, type Currency } from './stats';
 import { addDays } from './time';
 
 export type ThresholdBadgeId =
@@ -46,10 +46,11 @@ export const ATTITUDE_BADGES: readonly AttitudeBadgeId[] = [
 export const TOTAL_BADGES = THRESHOLD_BADGES.length + ATTITUDE_BADGES.length;
 export const FIVE_MORNINGS_DAYS = 5;
 export const WAVE_MASTER_COUNT = 3;
+export const PIGGY_BANK_THRESHOLD: Record<Currency, number> = { PLN: 100, EUR: 25, USD: 25, GBP: 20 };
 
 /** Minutes that count toward threshold badges: nothing until the goal is reached or the challenge ends. */
 export function countedMinutes(ch: Challenge, now: Date): number {
-  const c = refresh(ch, now);
+  const c = advance(ch, now);
   return c.status === 'running' ? 0 : liveResultMinutes(c, now);
 }
 
@@ -65,43 +66,40 @@ export interface BadgeContext {
   now: Date;
 }
 
+/**
+ * One rule per attitude badge, evaluated against stored state at `now`. `new_record` has no rule
+ * here: it is repeatable and awarded per closing transition by `isNewRecord`.
+ */
+const ATTITUDE_RULES: Record<Exclude<AttitudeBadgeId, 'new_record'>, (ctx: BadgeContext) => boolean> = {
+  five_mornings: ({ challenges, now }) => morningStreak(challenges, now) >= FIVE_MORNINGS_DAYS,
+  extra_time: ({ challenges, now }) => challenges.some((c) => advance(c, now).overtimeBlocksCompleted > 0),
+  honesty: ({ challenges }) => {
+    const startedDays = new Set(challenges.map((c) => c.day));
+    return challenges.some((c) => c.status === 'interrupted' && startedDays.has(addDays(c.day, 1)));
+  },
+  wave_master: ({ challenges }) =>
+    challenges.filter((c) => c.status === 'completed' && c.usedCravingHelp).length >= WAVE_MASTER_COUNT,
+  piggy_bank: ({ totalSavings, currency }) => totalSavings >= PIGGY_BANK_THRESHOLD[currency],
+};
+
 /** Badges whose conditions hold and that are not yet earned. Badges are never taken away. */
 export function newBadges(ctx: BadgeContext): BadgeId[] {
-  const { challenges, earned, now } = ctx;
-  const found: BadgeId[] = [];
-
-  const best = challenges.reduce((max, c) => Math.max(max, countedMinutes(c, now)), 0);
-  found.push(...thresholdBadgesReached(best));
-
-  if (morningStreak(challenges, now) >= FIVE_MORNINGS_DAYS) found.push('five_mornings');
-
-  if (challenges.some((c) => refresh(c, now).overtimeBlocksCompleted > 0)) found.push('extra_time');
-
-  const startedDays = new Set(challenges.map((c) => c.day));
-  if (challenges.some((c) => c.status === 'interrupted' && startedDays.has(addDays(c.day, 1)))) {
-    found.push('honesty');
-  }
-
-  const helpedSuccesses = challenges.filter((c) => c.status === 'completed' && c.usedCravingHelp).length;
-  if (helpedSuccesses >= WAVE_MASTER_COUNT) found.push('wave_master');
-
-  if (ctx.totalSavings >= PIGGY_BANK_THRESHOLD[ctx.currency]) found.push('piggy_bank');
-
-  return found.filter((id) => !earned.has(id));
+  const best = ctx.challenges.reduce((max, c) => Math.max(max, countedMinutes(c, ctx.now)), 0);
+  const found: BadgeId[] = [
+    ...thresholdBadgesReached(best),
+    ...ATTITUDE_BADGES.filter((id) => id !== 'new_record' && ATTITUDE_RULES[id](ctx)),
+  ];
+  return found.filter((id) => !ctx.earned.has(id));
 }
 
 /** "Nowy rekord": beats every earlier closed result, and an earlier result exists. Repeatable. */
 export function isNewRecord(closedChallenge: Challenge, challenges: readonly Challenge[]): boolean {
-  if (!isClosed(closedChallenge) || closedChallenge.resultMinutes === null) return false;
+  if (!isClosed(closedChallenge)) return false;
   const previousBest = challenges
-    .filter(
-      (c) =>
-        c.id !== closedChallenge.id &&
-        isClosed(c) &&
-        c.startedAt.getTime() < closedChallenge.startedAt.getTime(),
-    )
-    .reduce((max, c) => Math.max(max, c.resultMinutes ?? 0), 0);
-  return previousBest > 0 && closedChallenge.resultMinutes > previousBest;
+    .filter(isClosed)
+    .filter((c) => c.id !== closedChallenge.id && c.startedAt.getTime() < closedChallenge.startedAt.getTime())
+    .reduce((max, c) => Math.max(max, c.resultMinutes), 0);
+  return beatsRecord(closedChallenge.resultMinutes, previousBest);
 }
 
 export type CelebrationTier = 'small' | 'medium' | 'large';
