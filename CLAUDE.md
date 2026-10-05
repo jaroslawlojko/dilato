@@ -34,8 +34,8 @@ The repo lives on a drive without ownership info. Run git as `git -c safe.direct
 - 2026-09-30 — Plan 1 (foundation & domain core) implemented: `app/src/domain` complete and tested; spec clarified in §13 items 11–14. **Next:** write plan 2 (local data & app services) — read "Carried from plan 1" in `docs/superpowers/plans/2026-09-29-00-roadmap.md` first.
 - 2026-10-04 — Domain refinement (quality + architecture review): one exported `advance(ch, now)` replaces `refresh`/`rollover`; `isClosed` narrows to `ClosedChallenge`; one internal close path; attitude badges as a typed rule table. Caller contract in the roadmap updated. No behaviour change.
 - 2026-10-04 — Plan 2 (local data & app services) implemented: `src/data` (SQLite seam, schema v1, validated mappers, outbox write path, repositories, `ChallengeService`) and `reconcile` in the domain. **Next:** write plan 3 (UI system & core screens) — read "Carried from plan 2" in the roadmap first.
-- 2026-09-30 — Repo audit: no secrets in tracked files. The repo has no git remote and no GitHub repository yet; work is on the local branch `plan-1-domain-core` (from `master`).
-- Pending: push backlog (`docs/superpowers/plans/backlog-draft.json`, 42 items) to GitHub Project https://github.com/users/jaroslawlojko/projects/4. Unblocked as of 2026-09-30: `gh` is logged in with `project` + `repo` scopes and the project is empty (0 items, 18 fields), so there are no duplicates to skip. Issues need a GitHub repository first; otherwise add them as draft items.
+- 2026-10-05 — Plan 2 merged to `main` (f993acb) and pushed; issues #10–#14, #44, #45, #56 closed (Done on project #6). Repo: https://github.com/jaroslawlojko/dilato, backlog board = user project #6.
+- **Resume here:** (1) optionally file the 7 deferred review findings from plan 2 as backlog issues — listed under "Deferred from the plan 2 review" in the roadmap; (2) owner decisions #49–#52 (they shape plan 3 screens); (3) write plan 3 (#15) — read "Carried from plan 2" in the roadmap first.
 - Open owner tasks:
   - medical review of body-benefit copy (launch blocker);
   - native-speaker review of the EN copy;
